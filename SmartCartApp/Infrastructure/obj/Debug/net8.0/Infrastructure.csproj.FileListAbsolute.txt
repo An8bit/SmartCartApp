@@ -10,3 +10,7 @@ D:\Desktop\SmartCartApp\SmartCartApp\Infrastructure\obj\Debug\net8.0\Infrastruct
 D:\Desktop\SmartCartApp\SmartCartApp\Infrastructure\obj\Debug\net8.0\refint\Infrastructure.dll
 D:\Desktop\SmartCartApp\SmartCartApp\Infrastructure\obj\Debug\net8.0\Infrastructure.pdb
 D:\Desktop\SmartCartApp\SmartCartApp\Infrastructure\obj\Debug\net8.0\ref\Infrastructure.dll
+D:\Desktop\SmartCartApp\SmartCartApp\Infrastructure\bin\Debug\net8.0\Core.dll
+D:\Desktop\SmartCartApp\SmartCartApp\Infrastructure\bin\Debug\net8.0\Core.pdb
+D:\Desktop\SmartCartApp\SmartCartApp\Infrastructure\obj\Debug\net8.0\Infrastructure.csproj.AssemblyReference.cache
+D:\Desktop\SmartCartApp\SmartCartApp\Infrastructure\obj\Debug\net8.0\Infrastr.15EFFBFE.Up2Date
