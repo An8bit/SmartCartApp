@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Web.Data;
+using Web.Mapping;
 using Web.Repositories.Contracts;
 using Web.Repositories.Implementations;
+using Web.Repositories.Interfaces;
+using Web.Repositories.Interfaces.Service;
 using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,12 +30,18 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// Add services to the container.
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+// Register repositories
+builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
 // Register services
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<UserService>(); // Add this line
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+// Configure AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 
 //builder.WebHost.ConfigureKestrel(options =>
 //{
@@ -41,8 +50,17 @@ builder.Services.AddScoped<UserService>(); // Add this line
 //        listenOptions.UseHttps(); // Bật HTTPS
 //    });
 //});
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 var app = builder.Build();
+// Register AutoMapper
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

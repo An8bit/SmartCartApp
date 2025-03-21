@@ -14,7 +14,7 @@ namespace Web.Models.DTO
 
         public required ICollection<UserAddressDto> UserAddresses { get; set; }
         public required ICollection<OrderDto> Orders { get; set; }
-        public required ICollection<ProductReviewDto> ProductReviews { get; set; }
+        
 
         public static  UserDto  ConvertToDto(User user)
         {
@@ -64,15 +64,8 @@ namespace Web.Models.DTO
                     }).ToList(),
                     CreatedAt = o.CreatedAt,
                     UpdatedAt = o.UpdatedAt
-                }).ToList(),
-                ProductReviews = user.ProductReviews!.Select(r => new ProductReviewDto
-                {
-                    ReviewId = r.ReviewId,
-                    ProductId = r.ProductId,
-                    Rating = r.Rating,
-                    ReviewText = r.ReviewText,
-                    CreatedAt = r.CreatedAt
                 }).ToList()
+               
             };
         }
         public static List<UserDto> ConvertToDtoList(List<User> users)

@@ -1,11 +1,14 @@
-﻿using Web.Models.Domain;
+﻿using SmartCartApp.Core.DTOs;
+using Web.Models.Domain;
+using Web.Models.DTO;
+using Web.Repositories.Interfaces;
 
 namespace Web.Repositories.Contracts
 {
-    public interface IProductRepository
+    public interface IProductRepository : IRepository<Product>
     {
-        Task<List<Product>> GetAllProduct();
-        Task<Product> GetProductById(int id);
-
+        Task<IEnumerable<Product>> GetByCategoryAsync(int categoryId);
+        Task<PagedResultDto<Product>> GetFilteredProductsAsync(ProductFilterOptions options);
+        //Task<PagedResultDto<Product>> SearchProductsAsync(string keyword, int page, int pageSize);
     }
 }
