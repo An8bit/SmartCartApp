@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using SmartCartApp.Core.DTOs;
 using Web.Models.Domain;
+using Web.Models.DTO.ProductDTOs;
 using Web.Repositories.Contracts;
 using Web.Repositories.Interfaces.Service;
 

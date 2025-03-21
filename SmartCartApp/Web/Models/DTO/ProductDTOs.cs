@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SmartCartApp.Core.DTOs
+namespace Web.Models.DTO.ProductDTOs
 {
     // Product DTOs
     public class ProductDto
@@ -157,27 +157,7 @@ namespace SmartCartApp.Core.DTOs
         public bool IncludeDeleted { get; set; } = false;
     }
 
-    // Category DTOs
-    public class CategoryDto
-    {
-        public int CategoryId { get; set; }
-
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public int ProductCount { get; set; }
-    }
-
-    public class CreateCategoryDto
-    {
-        [Required(ErrorMessage = "Tên danh mục là bắt buộc")]
-        [StringLength(50, MinimumLength = 2, ErrorMessage = "Tên danh mục phải từ 2 đến 50 ký tự")]
-        public string Name { get; set; }
-
-        [StringLength(500, ErrorMessage = "Mô tả không được vượt quá 500 ký tự")]
-        public string Description { get; set; }
-    }
+    
 
     // Generic Paging DTO
     public class PagedResultDto<T>

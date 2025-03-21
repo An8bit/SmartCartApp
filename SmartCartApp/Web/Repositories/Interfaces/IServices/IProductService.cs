@@ -1,4 +1,6 @@
-﻿using SmartCartApp.Core.DTOs;
+﻿
+
+using Web.Models.DTO.ProductDTOs;
 
 namespace Web.Repositories.Interfaces.Service
 {

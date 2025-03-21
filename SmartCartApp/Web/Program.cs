@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Web.Data;
 using Web.Mapping;
+using Web.MappingProfile;
 using Web.Repositories.Contracts;
 using Web.Repositories.Implementations;
 using Web.Repositories.Interfaces;
@@ -40,8 +41,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // Configure AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-
+builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
+builder.Services.AddAutoMapper(typeof(CategoryMappingProfile));
 
 //builder.WebHost.ConfigureKestrel(options =>
 //{
@@ -76,3 +77,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+

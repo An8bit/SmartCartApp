@@ -1,36 +1,60 @@
-﻿using SmartCartApp.Core.DTOs;
+﻿using AutoMapper;
+using Web.Models.DTO.ProductDTOs;
+using Web.Models.DTO.CategoryDTOs;
+using Web.Repositories.Contracts;
 using Web.Repositories.Interfaces.Service;
+using Web.Models.Domain;
 
 namespace Web.Services
 {
     public class CategoryService : ICategoryService
     {
 
-        private readonly ICategoryService _categoryService;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly IMapper _mapper;
 
-        public Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto categoryDto)
+        public CategoryService(ICategoryRepository categoryRepository, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _categoryRepository = categoryRepository;
+            _mapper = mapper;
         }
 
-        public Task DeleteCategoryAsync(int id)
+        public async Task<CategoryDto> CreateCategoryAsync(CategoryCreateDto categoryDto)
         {
-            throw new NotImplementedException();
+           var category = _mapper.Map<Category>(categoryDto);
+            var createdCategory = await _categoryRepository.AddAsync(category);
+            return _mapper.Map<CategoryDto>(createdCategory);
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync()
+        public async Task DeleteCategoryAsync(int id)
         {
-            throw new NotImplementedException();
+            var category = await _categoryRepository.GetByIdAsync(id);
+            if (category == null)
+                throw new KeyNotFoundException($"Category with ID {id} not found");
+            await _categoryRepository.DeleteAsync(id);
         }
 
-        public Task<CategoryDto> GetCategoryByIdAsync(int id)
+        public async Task<IEnumerable<CategoryBasicDto>> GetAllCategoriesAsync()
         {
-            throw new NotImplementedException();
+
+            var categories = await _categoryRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<CategoryBasicDto>>(categories);
         }
 
-        public Task UpdateCategoryAsync(int id, CreateCategoryDto categoryDto)
+        public async Task<CategoryDto> GetCategoryByIdAsync(int id)
         {
-            throw new NotImplementedException();
+           var category = await _categoryRepository.GetByIdAsync(id);
+            return _mapper.Map<CategoryDto>(category);
+        }
+
+        public async Task UpdateCategoryAsync(int id, CategoryUpdateDto categoryDto)
+        {
+            var category = await _categoryRepository.GetByIdAsync(id);
+
+            if (category == null)
+                throw new KeyNotFoundException($"Category with ID {id} not found");
+            _mapper.Map(categoryDto, category);
+            await _categoryRepository.UpdateAsync(category);
         }
     }
 }

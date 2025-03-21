@@ -28,6 +28,7 @@ namespace Web.Repositories.Implementations
 
         public virtual async Task<IEnumerable<T>> GetAllAsync()
         {
+            var entities = await _dbSet.ToListAsync();
             return await _dbSet.ToListAsync();
         }
 

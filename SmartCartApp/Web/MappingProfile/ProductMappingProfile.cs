@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
-using SmartCartApp.Core.DTOs;
+
 using System.Linq;
 using Web.Models.Domain;
+using Web.Models.DTO.CategoryDTOs;
+using Web.Models.DTO.ProductDTOs;
 
 namespace Web.Mapping
 {
-    public class MappingProfile : Profile
+    public class ProductMappingProfile : Profile
     {
-        public MappingProfile()
+        public ProductMappingProfile()
         {
             // Product mappings
             CreateMap<Product, ProductDto>()
@@ -38,15 +40,8 @@ namespace Web.Mapping
                 .ForMember(dest => dest.ImageUrl, opt => opt.Condition(src => !string.IsNullOrEmpty(src.ImageUrl)))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
 
-            // Category mappings
-            CreateMap<Category, CategoryDto>()
-                .ForMember(dest => dest.ProductCount, opt =>
-                    opt.MapFrom(src => src.Products != null ?
-                        src.Products.Count(p => !p.IsDeleted) : 0));
-
-            CreateMap<CreateCategoryDto, Category>();
         }
 
-
+        
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SmartCartApp.Core.DTOs;
+using Web.Models.DTO.ProductDTOs;
 using Web.Repositories.Interfaces.Service;
 using Web.Services;
 

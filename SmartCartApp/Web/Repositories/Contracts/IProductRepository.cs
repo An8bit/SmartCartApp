@@ -1,6 +1,6 @@
-﻿using SmartCartApp.Core.DTOs;
+﻿
 using Web.Models.Domain;
-using Web.Models.DTO;
+using Web.Models.DTO.ProductDTOs;
 using Web.Repositories.Interfaces;
 
 namespace Web.Repositories.Contracts

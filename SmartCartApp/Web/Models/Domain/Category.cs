@@ -11,13 +11,13 @@ namespace Web.Models.Domain
         public string Description { get; set; } = string.Empty;
         public int? ParentCategoryId { get; set; }  // Danh mục cha (đệ quy)
 
-        [JsonIgnore] // 🚀 Tránh vòng lặp
+        [JsonIgnore]  
         public required Category ParentCategory { get; set; } 
 
-        [JsonIgnore] // 🚀 Tránh vòng lặp
+        [JsonIgnore] 
         public required ICollection<Category> SubCategories { get; set; }
 
-        [JsonIgnore] // 🚀 Tránh vòng lặp
+        [JsonIgnore] 
         public required ICollection<Product> Products { get; set; }
     }
 }

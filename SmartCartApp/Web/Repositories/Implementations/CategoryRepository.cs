@@ -1,7 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections;
 using Web.Data;
 using Web.Models.Domain;
+using Web.Models.DTO.CategoryDTOs;
+using Web.Models.DTO.ProductDTOs;
+
 using Web.Repositories.Contracts;
 
 namespace Web.Repositories.Implementations
@@ -12,28 +16,20 @@ namespace Web.Repositories.Implementations
         {
         }
 
-        public override async Task<Category> GetByIdAsync(int id)
+        public async Task<Category> GetByIdWithRelatedDataAsync(int id)
         {
-
-            var result = await _context.Categories
-                .Include(c => c.Products)
+            var category = await _context.Categories
+                
+                
+               
                 .FirstOrDefaultAsync(c => c.CategoryId == id);
-            if (result == null)
+            if (category == null)
             {
                 throw new KeyNotFoundException($"Category with id {id} not found.");
-
             }
-            return result;
-        }
-        public IEnumerator<Category> GetEnumerator()
-        {
-            throw new NotImplementedException();
+            return category;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+       
     }
-   
 }

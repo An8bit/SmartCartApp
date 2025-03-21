@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SmartCartApp.Core.DTOs;
+using Web.Models.DTO.ProductDTOs;
 using Web.Data;
 using Web.Models.Domain;
 using Web.Repositories.Contracts;

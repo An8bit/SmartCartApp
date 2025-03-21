@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SmartCartApp.Core.DTOs;
+using Web.Models.DTO.CategoryDTOs;
 using Web.Repositories.Interfaces.Service;
 
 namespace Web.Controllers
@@ -33,7 +33,7 @@ namespace Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto categoryDto)
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryCreateDto categoryDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -43,7 +43,7 @@ namespace Web.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CreateCategoryDto categoryDto)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryUpdateDto categoryDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -51,7 +51,7 @@ namespace Web.Controllers
             try
             {
                 await _categoryService.UpdateCategoryAsync(id, categoryDto);
-                return NoContent();
+                return Ok();
             }
             catch (KeyNotFoundException)
             {
@@ -65,7 +65,7 @@ namespace Web.Controllers
             try
             {
                 await _categoryService.DeleteCategoryAsync(id);
-                return NoContent();
+                return Ok();
             }
             catch (KeyNotFoundException)
             {
