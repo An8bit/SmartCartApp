@@ -16,12 +16,12 @@ namespace Web.Models.Domain
         public DateTime? UpdatedAt { get; set; }
         public bool IsDeleted { get; set; } = false;
 
-        [JsonIgnore] // 🚀 Tránh vòng lặp
+        [JsonIgnore] // 
         public Category Category { get; set; }
 
         public ICollection<ProductVariant> Variants { get; set; }
 
-        [JsonIgnore] // 🚀 Tránh vòng lặp
+        [JsonIgnore] // 
         public ICollection<ProductReview> Reviews { get; set; }
     }
 }

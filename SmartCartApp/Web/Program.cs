@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Web.Data;
 using Web.Repositories.Contracts;
 using Web.Repositories.Implementations;
+using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 //connct Mysql database server
@@ -27,9 +29,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Add services to the container.
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+// Register services
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<UserService>(); // Add this line
 
-
-
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ListenAnyIP(5132, listenOptions =>
+//    {
+//        listenOptions.UseHttps(); // Bật HTTPS
+//    });
+//});
 
 var app = builder.Build();
 
@@ -39,13 +50,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5132, listenOptions =>
-    {
-        listenOptions.UseHttps(); // Bật HTTPS
-    });
-});
 app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 
