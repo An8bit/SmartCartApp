@@ -6,6 +6,7 @@ using Web.MappingProfile;
 using Web.Repositories.Contracts;
 using Web.Repositories.Implementations;
 using Web.Repositories.Interfaces;
+using Web.Repositories.Interfaces.IServices;
 using Web.Repositories.Interfaces.Service;
 using Web.Services;
 
@@ -35,14 +36,17 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Register services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Configure AutoMapper
 builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 builder.Services.AddAutoMapper(typeof(CategoryMappingProfile));
+builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 
 //builder.WebHost.ConfigureKestrel(options =>
 //{

@@ -2,106 +2,90 @@
 using Web.Data;
 using Web.Models.Domain;
 using Web.Models.DTO;
+using Web.Models.DTO.ProductDTOs;
+using Web.Models.DTO.UrserDTOs;
 using Web.Repositories.Contracts;
 
 namespace Web.Repositories.Implementations
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
-        private readonly ApplicationDbContext _context;
+       
 
-        public UserRepository(ApplicationDbContext context)
+        public UserRepository(ApplicationDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        public async Task<bool> CreateUser(AddUserRequestDto requestDto)
+        public Task<UserAddress> AddUserAddressAsync(UserAddress address)
         {
-
-            if (await _context.Users.AnyAsync(u => u.Email == requestDto.Email))
-            {
-                throw new Exception("Email đã tồn tại.");
-            }
-
-
-            var user = new User
-            {
-                FullName = requestDto.FullName,
-                Email = requestDto.Email,
-                PasswordHash = requestDto.Password,
-                Phone = requestDto.Phone,
-                Role = requestDto.Role,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return true;
-
+            throw new NotImplementedException();
         }
 
-        public async Task<bool> DeleteUserById(int id)
+        public Task DeleteUserAddressAsync(int addressId)
         {
+            throw new NotImplementedException();
+        }
 
-            var user = await _context.Users.FindAsync(id);
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
             if (user == null)
-            {
+                return null;
+            return user;
+        }
+
+        public Task<User> GetByIdWithDetailsAsync(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PagedResultDto<User>> GetFilteredUsersAsync(UserFilterDto filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserAddress> GetUserAddressByIdAsync(int addressId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<UserAddress>> GetUserAddressesAsync(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsEmailExistsAsync(string email, int? excludeUserId = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> LoginAsync(UserLoginDto userLogin)
+        {
+          var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userLogin.Email && x.PasswordHash == userLogin.Password);
+            if (user == null)
                 return false;
-            }
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<User>> GetAllUser()
-        {
-            return await _context.Users
-        .Include(u => u.UserAddresses)
-        .Include(u => u.Orders)
-        .Include(u => u.ProductReviews)
-        .ToListAsync();
-        }
+     
 
-        public Task<User?> GetOrdersByUserId(int orderId)
+        public async Task<bool> RegisterAsync(User userRegister)
         {
-            return _context.Users.Include(u => u.Orders).FirstOrDefaultAsync(u => u.UserId == orderId);
-        }
-
-        public async Task<User?> GetUserByEmail(string email)
-        {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-           
-
-        }
-
-        public async Task<User> GetUserById(int id)
-        {
-            return await _context.Users.
-                 Include(u => u.UserAddresses)
-                 .Include(u => u.Orders)
-                 .Include(u => u.ProductReviews)
-                 .FirstAsync(u => u.UserId == id);
-        }
-
-        public async Task<bool> UpdateUserById(int id, UpdateUserRequestDto updateUserRequestDto)
-        {
-            var userInDb = await _context.Users.FindAsync(id);
-            if (userInDb == null)
-            {
+            var user = await GetByEmailAsync(userRegister.Email);
+            if (user != null)
                 return false;
-            }
-            //convert dto to domain
-            userInDb.FullName = updateUserRequestDto.FullName;
-            userInDb.Email = updateUserRequestDto.Email;
-            userInDb.Phone = updateUserRequestDto.Phone;
-            userInDb.Role = updateUserRequestDto.Role;
-            userInDb.UpdatedAt = DateTime.UtcNow;
-
-            _context.Update(userInDb);
-            await _context.SaveChangesAsync();
+            await AddAsync(userRegister);
             return true;
+        }
 
+        public Task<bool> SetDefaultAddressAsync(int userId, int addressId)
+        {
+            throw new NotImplementedException();
+        }
 
+        public Task UpdateUserAddressAsync(UserAddress address)
+        {
+            throw new NotImplementedException();
         }
     }
 }

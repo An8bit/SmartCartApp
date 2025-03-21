@@ -1,4 +1,6 @@
-﻿namespace Web.Models.DTO
+﻿using Web.Models.DTO.UserAddressDTOs;
+
+namespace Web.Models.DTO
 {
     public class OrderDto
     {

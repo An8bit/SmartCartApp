@@ -1,16 +1,34 @@
 ﻿using Web.Models.Domain;
 using Web.Models.DTO;
+using Web.Models.DTO.ProductDTOs;
+using Web.Models.DTO.UrserDTOs;
+using Web.Repositories.Interfaces;
 
 namespace Web.Repositories.Contracts
 {
-    public interface IUserRepository
+    public interface IUserRepository : IRepository<User>
     {
-        Task<List<User>> GetAllUser();
-        Task<User> GetUserById(int id);
-        Task<bool> UpdateUserById(int id, UpdateUserRequestDto updateUserRequestDto);
-        Task<bool> DeleteUserById(int id);
-        Task<bool> CreateUser(AddUserRequestDto requestDto);
-        Task<User?> GetUserByEmail(string email);
-        Task<User?> GetOrdersByUserId(int orderId);
+        Task<User?> GetByEmailAsync(string email);
+
+        Task<bool> IsEmailExistsAsync(string email, int? excludeUserId = null);
+
+        Task<User> GetByIdWithDetailsAsync(int userId);
+
+        Task<PagedResultDto<User>> GetFilteredUsersAsync(UserFilterDto filter);
+
+        Task<IEnumerable<UserAddress>> GetUserAddressesAsync(int userId);
+
+        Task<UserAddress> GetUserAddressByIdAsync(int addressId);
+
+        Task<UserAddress> AddUserAddressAsync(UserAddress address);
+
+        Task UpdateUserAddressAsync(UserAddress address);
+
+        Task DeleteUserAddressAsync(int addressId);
+
+        Task<bool> SetDefaultAddressAsync(int userId, int addressId);
+        //regester and login
+        Task<bool> RegisterAsync(User userRegister);
+        Task<bool> LoginAsync(UserLoginDto userLogin);
     }
 }
