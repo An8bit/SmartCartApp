@@ -4,12 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace Web.Models.Domain
 {
-    public class OrderItem
+    public class CartItem
     {
         [Key]
-        public int OrderItemId { get; set; }
+        public int CartItemId { get; set; }
 
-        public int OrderId { get; set; }
+        public int CartId { get; set; }
 
         public int ProductId { get; set; }
 
@@ -19,11 +19,15 @@ namespace Web.Models.Domain
         public int Quantity { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal Price { get; set; }
+        public decimal UnitPrice { get; set; }
 
-        [ForeignKey("OrderId")]
+        public DateTime AddedAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        [ForeignKey("CartId")]
         [JsonIgnore]
-        public Order Order { get; set; }
+        public ShoppingCart Cart { get; set; }
 
         [ForeignKey("ProductId")]
         [JsonIgnore]
@@ -32,5 +36,8 @@ namespace Web.Models.Domain
         [ForeignKey("ProductVariantId")]
         [JsonIgnore]
         public ProductVariant? ProductVariant { get; set; }
+
+        [NotMapped]
+        public decimal TotalPrice => Quantity * UnitPrice;
     }
 }

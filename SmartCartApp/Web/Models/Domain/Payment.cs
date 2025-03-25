@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Web.Models.Domain
 {
@@ -6,13 +8,28 @@ namespace Web.Models.Domain
     {
         [Key]
         public int PaymentId { get; set; }
-        public int OrderId { get; set; }
-        public string PaymentMethod { get; set; }
-        public decimal Amount { get; set; }
-        public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
-        public string Status { get; set; } = "Pending";
-        public string TransactionId { get; set; }  // Mã giao dịch từ cổng thanh toán
 
+        public int OrderId { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string PaymentMethod { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        [Range(0, double.MaxValue)]
+        public decimal Amount { get; set; }
+
+        public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
+
+        [Required]
+        [StringLength(50)]
+        public string Status { get; set; } = "Pending";
+
+        [StringLength(100)]
+        public string? TransactionId { get; set; }
+
+        [ForeignKey("OrderId")]
+        [JsonIgnore]
         public Order Order { get; set; }
     }
 }
