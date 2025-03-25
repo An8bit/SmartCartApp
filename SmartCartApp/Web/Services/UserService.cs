@@ -23,9 +23,23 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public Task<UserDto> AdminUpdateUserAsync(int userId, UserAdminUpdateDto updateDto)
+        public async Task<UserDto> AdminUpdateUserAsync(int userId, UserAdminUpdateDto updateDto)
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException($"Không tìm thấy người dùng với ID: {userId}");
+
+            // Check if email is being changed and already exists
+            if (!string.IsNullOrEmpty(updateDto.Email) &&
+                updateDto.Email != user.Email &&
+                await _userRepository.IsEmailExistsAsync(updateDto.Email, userId))
+                throw new InvalidOperationException($"Email {updateDto.Email} đã được sử dụng");
+
+            _mapper.Map(updateDto, user);
+
+            await _userRepository.UpdateAsync(user);
+
+            return _mapper.Map<UserDto>(user);
         }
 
         public Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto)
@@ -33,9 +47,20 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public Task<UserDto> CreateUserAsync(UserCreateDto createDto)
+        public async Task<UserDto> CreateUserAsync(UserCreateDto createDto)
         {
-            throw new NotImplementedException();
+            // Check if email already exists
+            if (await _userRepository.IsEmailExistsAsync(createDto.Email))
+                throw new InvalidOperationException($"Email {createDto.Email} đã được sử dụng");
+
+            // Map DTO to entity
+            var newUser = _mapper.Map<User>(createDto);
+
+            // Save user
+            var createdUser = await _userRepository.AddAsync(newUser);
+
+            // Return user DTO
+            return _mapper.Map<UserDto>(createdUser);
         }
 
         public Task<bool> DeleteUserAddressAsync(int addressId)
@@ -43,9 +68,13 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteUserAsync(int userId)
+        public async Task<bool> DeleteUserAsync(int userId)
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException($"Không tìm thấy người dùng với ID: {userId}");
+            await _userRepository.DeleteAsync(userId);
+            return true;
         }
 
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
