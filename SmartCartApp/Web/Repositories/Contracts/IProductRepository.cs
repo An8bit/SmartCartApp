@@ -9,6 +9,7 @@ namespace Web.Repositories.Contracts
     {
         Task<IEnumerable<Product>> GetByCategoryAsync(int categoryId);
         Task<PagedResultDto<Product>> GetFilteredProductsAsync(ProductFilterOptions options);
+       
         //Task<PagedResultDto<Product>> SearchProductsAsync(string keyword, int page, int pageSize);
     }
 }
