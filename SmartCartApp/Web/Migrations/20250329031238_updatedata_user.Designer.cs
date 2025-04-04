@@ -12,8 +12,8 @@ using Web.Data;
 namespace Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250325043623_DatabaseRestructure")]
-    partial class DatabaseRestructure
+    [Migration("20250329031238_updatedata_user")]
+    partial class updatedata_user
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -403,6 +403,14 @@ namespace Web.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime>("LastPurchaseDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("MembershipTier")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -414,6 +422,9 @@ namespace Web.Migrations
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<decimal>("TotalSpending")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -462,6 +473,41 @@ namespace Web.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserAddresses");
+                });
+
+            modelBuilder.Entity("Web.Models.Domain.UserMembershipHistory", b =>
+                {
+                    b.Property<int>("HistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("HistoryId"));
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("NewTier")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<string>("OldTier")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("HistoryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserMembershipHistories");
                 });
 
             modelBuilder.Entity("Web.Models.Domain.CartItem", b =>
@@ -618,6 +664,17 @@ namespace Web.Migrations
                 {
                     b.HasOne("Web.Models.Domain.User", "User")
                         .WithMany("UserAddresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Web.Models.Domain.UserMembershipHistory", b =>
+                {
+                    b.HasOne("Web.Models.Domain.User", "User")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

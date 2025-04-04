@@ -34,19 +34,19 @@ namespace Web.Services
                 throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID: {addToCartDto.ProductId}");
             }
 
-            // Kiểm tra biến thể sản phẩm nếu có
-            //ProductVariant variant = null;
-            //if (addToCartDto.ProductVariantId.HasValue)
-            //{
-            //    variant = product.Variants?.FirstOrDefault(v => v.ProductVariantId == addToCartDto.ProductVariantId.Value);
-            //    if (variant == null)
-            //    {
-            //        throw new KeyNotFoundException($"Không tìm thấy biến thể sản phẩm với ID: {addToCartDto.ProductVariantId.Value}");
-            //    }
-            //}
+            //  Kiểm tra biến thể sản phẩm nếu có
+            ProductVariant? variant = null;
+            if (addToCartDto.ProductVariantId.HasValue)
+            {
+                variant = product.Variants?.FirstOrDefault(v => v.VariantId == addToCartDto.ProductVariantId);
+                if (variant == null)
+                {
+                    throw new KeyNotFoundException($"Không tìm thấy biến thể sản phẩm với ID: {addToCartDto.ProductVariantId.Value}");
+                }
+            }
 
             // Kiểm tra tồn kho
-            //int inStock = variant != null ? variant.InStock : product.InStock;
+            //int inStock = variant != null ? variant.StockQuantity : product.ProductId;
             //if (inStock < addToCartDto.Quantity)
             //{
             //    throw new InvalidOperationException($"Sản phẩm không đủ số lượng. Hiện chỉ còn {inStock} sản phẩm.");
@@ -304,9 +304,9 @@ namespace Web.Services
             return updatedCartDto;
         }
         // Helper method để lấy entity giỏ hàng
-        private async Task<ShoppingCart> GetCartEntityAsync(int? userId, string sessionId)
+        private async Task<ShoppingCart?> GetCartEntityAsync(int? userId, string sessionId)
         {
-            ShoppingCart cart = null;
+            ShoppingCart? cart = null;
 
             if (userId.HasValue)
             {

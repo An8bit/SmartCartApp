@@ -29,6 +29,8 @@ namespace Web.Models.DTO.CategoryDTOs
 
         public int? ParentCategoryId { get; set; }
 
+        public string Description { get; set; } 
+
         public int ProductCount { get; set; }
     }
 

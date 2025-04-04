@@ -12,12 +12,12 @@ namespace Web.Models.Domain
         public int? ParentCategoryId { get; set; }  // Danh mục cha (đệ quy)
 
         [JsonIgnore]  
-        public required Category ParentCategory { get; set; } 
+        public  Category? ParentCategory { get; set; } 
 
         [JsonIgnore] 
-        public required ICollection<Category> SubCategories { get; set; }
+        public  ICollection<Category>? SubCategories { get; set; }
 
         [JsonIgnore] 
-        public required ICollection<Product> Products { get; set; }
+        public  ICollection<Product>? Products { get; set; }
     }
 }

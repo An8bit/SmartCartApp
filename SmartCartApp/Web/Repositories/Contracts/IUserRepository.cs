@@ -29,6 +29,6 @@ namespace Web.Repositories.Contracts
         Task<bool> SetDefaultAddressAsync(int userId, int addressId);
         //regester and login
         Task<bool> RegisterAsync(User userRegister);
-        Task<bool> LoginAsync(UserLoginDto userLogin);
+        Task<User?> LoginAsync(UserLoginDto userLogin);
     }
 }

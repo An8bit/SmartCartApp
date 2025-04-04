@@ -32,6 +32,10 @@ namespace Web.Models.DTO.ProductDTOs
         public double? AverageRating { get; set; }
 
         public int ReviewsCount { get; set; }
+        public decimal? OriginalPrice { get; set; }
+        public decimal? DiscountedPrice { get; set; }
+        public decimal? DiscountPercentage { get; set; }
+        public string? MembershipTierName { get; set; }
     }
 
     public class ProductVariantDto

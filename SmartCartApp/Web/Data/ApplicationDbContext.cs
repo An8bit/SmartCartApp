@@ -20,6 +20,7 @@ namespace Web.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<OrderHistory> OrderHistories { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<UserMembershipHistory> UserMembershipHistories { get; set; }
     }
 
 }

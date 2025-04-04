@@ -10,7 +10,7 @@ namespace Web.Repositories.Implementations
 {
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
-       
+
 
         public UserRepository(ApplicationDbContext context) : base(context)
         {
@@ -29,8 +29,6 @@ namespace Web.Repositories.Implementations
         public async Task<User?> GetByEmailAsync(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
-            if (user == null)
-                return null;
             return user;
         }
 
@@ -54,20 +52,18 @@ namespace Web.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsEmailExistsAsync(string email, int? excludeUserId = null)
+        public async Task<bool> IsEmailExistsAsync(string email, int? excludeUserId = null)
         {
-            throw new NotImplementedException();
+            if (excludeUserId.HasValue)
+                return await _context.Users.AnyAsync(u => u.Email == email && u.UserId != excludeUserId);
+            return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
-        public async Task<bool> LoginAsync(UserLoginDto userLogin)
+        public async Task<User?> LoginAsync(UserLoginDto userLogin)
         {
-          var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userLogin.Email && x.PasswordHash == userLogin.Password);
-            if (user == null)
-                return false;
-            return true;
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userLogin.Email && x.PasswordHash == userLogin.Password);
+            return user;
         }
-
-     
 
         public async Task<bool> RegisterAsync(User userRegister)
         {

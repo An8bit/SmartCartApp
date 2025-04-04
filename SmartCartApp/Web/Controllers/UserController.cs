@@ -43,10 +43,30 @@ namespace Web.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request", error = ex.Message });
             }
         }
+        [HttpGet("ProfileByEmail/{email}")]
+        public async Task<IActionResult> GetProfileByEmail(string email)
+        {
+            
+            try
+            {
+                var user = await _userService.GetUserByEmailAsync(email);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request", error = ex.Message });
+            }
+        }
+
         [HttpPost("Login")]
         public async Task<ActionResult> LoginAsync([FromBody] UserLoginDto loginDto)
         {
             var token = await _userService.LoginAsync(loginDto);
+
             if (token == null)
                 return Unauthorized();
             return Ok(token);

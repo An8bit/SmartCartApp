@@ -1,4 +1,5 @@
-﻿using Web.Models.DTO.ProductDTOs;
+﻿using Web.Models.Domain;
+using Web.Models.DTO.ProductDTOs;
 using Web.Models.DTO.UrserDTOs;
 using Web.Models.DTO.UserAddressDTOs;
 
@@ -19,7 +20,7 @@ namespace Web.Repositories.Interfaces.IServices
 
         // User profile methods
         Task<UserDto> GetUserByIdAsync(int userId);
-
+        Task<UserDto> GetUserByEmailAsync(string email);
 
         Task UpdateUserAsync(int userId, UserUpdateDto updateDto);
 

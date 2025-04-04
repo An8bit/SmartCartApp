@@ -54,20 +54,24 @@ builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(ShoppingCartMappingProfile));
 builder.Services.AddAutoMapper(typeof(OrderMappingProfile));
 
-//builder.WebHost.ConfigureKestrel(options =>
-//{
-//    options.ListenAnyIP(5132, listenOptions =>
-//    {
-//        listenOptions.UseHttps(); // Bật HTTPS
-//    });
-//});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
         builder => builder
-            .AllowAnyOrigin()
+         .WithOrigins(
+                "http://localhost:3000",    // Frontend dev
+                "http://localhost:5173",
+                "http://localhost:5000"// Vite default
+
+
+            )
+
             .AllowAnyMethod()
-            .AllowAnyHeader());
+
+            .AllowAnyHeader()
+           .AllowCredentials());
+
 });
 var app = builder.Build();
 // Register AutoMapper
@@ -79,8 +83,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
+
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 

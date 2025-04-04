@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Data.SqlTypes;
 using Web.Models.Domain;
 using Web.Models.DTO.ProductDTOs;
 using Web.Models.DTO.UrserDTOs;
@@ -95,6 +96,14 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
+        public async Task<UserDto> GetUserByEmailAsync(string email)
+        {
+            var user = await _userRepository.GetByEmailAsync(email);
+            if (user == null)
+                throw new KeyNotFoundException($"Không tìm thấy người dùng với email: {email}");
+            return _mapper.Map<UserDto>(user);
+        }
+
         public async Task<UserDto> GetUserByIdAsync(int userId)
         {
            var user = await _userRepository.GetByIdAsync(userId);
@@ -110,14 +119,16 @@ namespace Web.Services
 
         public async Task<string> LoginAsync(UserLoginDto loginDto)
         {
-           var checkemail = await _userRepository.GetByEmailAsync(loginDto.Email);
+            var checkemail = await _userRepository.GetByEmailAsync(loginDto.Email);
             if (checkemail == null)
                 return "Không tìm thấy user";
-            var login = await _userRepository.LoginAsync(loginDto);
-            if (login == false)
-                return "Password Sai";
-            return "Login successful";
 
+            var login = await _userRepository.LoginAsync(loginDto);
+            if (login == null)
+                return "Password Sai";
+
+            // Convert the object to a string representation with email included
+            return $"{{\"role\":\"{login.Role}\",\"authToken\":\"{login.Email}\",\"message\":\"Đăng nhập thành công\"}}";
         }
 
         public async Task<string> RegisterAsync(UserRegisterDto registerDto)

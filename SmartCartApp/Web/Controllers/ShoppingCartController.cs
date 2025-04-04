@@ -91,7 +91,7 @@ namespace Web.Controllers
             }
         }
         [HttpDelete("items/{cartItemId}")]
-        public async Task<IActionResult> RemoveCartItem(int cartItemId)
+        public async Task<IActionResult> RemoveCartItem(int cartItemId )
         {
             try
             {
@@ -161,14 +161,35 @@ namespace Web.Controllers
 
         private string GetOrCreateSessionId()
         {
-            var sessionId = GetSessionId();
-            if (string.IsNullOrEmpty(sessionId))
+            // Kiểm tra cookies trước
+            if (Request.Cookies.TryGetValue("CartSessionId", out var existingSessionId) && !string.IsNullOrEmpty(existingSessionId))
             {
-                sessionId = Guid.NewGuid().ToString();
-                SetSessionId(sessionId);
+                return existingSessionId;
             }
 
-            return sessionId;
+            // Kiểm tra trong request body hoặc query
+            var sessionIdFromRequest = HttpContext.Request.Query["sessionId"].ToString();
+            if (string.IsNullOrEmpty(sessionIdFromRequest))
+            {
+                // Cố gắng đọc từ body (nếu có)
+                try
+                {
+                    // Logic đọc từ body (tùy thuộc vào framework)
+                }
+                catch { }
+            }
+
+            if (!string.IsNullOrEmpty(sessionIdFromRequest))
+            {
+                // Sử dụng sessionId từ request
+                SetSessionId(sessionIdFromRequest);
+                return sessionIdFromRequest;
+            }
+
+            // Chỉ tạo mới khi không tìm thấy
+            var newSessionId = Guid.NewGuid().ToString();
+            SetSessionId(newSessionId);
+            return newSessionId;
         }
 
         private void SetSessionId(string sessionId)
@@ -178,7 +199,8 @@ namespace Web.Controllers
                 HttpOnly = true,
                 Expires = DateTime.UtcNow.AddDays(30),
                 SameSite = SameSiteMode.Lax,
-                Secure = Request.IsHttps
+                Secure = false,
+                Domain = null,
             };
 
             Response.Cookies.Append(SessionIdCookieName, sessionId, cookieOptions);

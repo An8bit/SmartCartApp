@@ -15,11 +15,18 @@ namespace Web.Mapping
             CreateMap<Product, ProductDto>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : null))
                 .ForMember(dest => dest.Variants, opt => opt.MapFrom(src => src.Variants))
+
                 .ForMember(dest => dest.AverageRating, opt =>
                     opt.MapFrom(src => src.Reviews != null && src.Reviews.Any() ?
                         src.Reviews.Average(r => r.Rating) : (double?)null))
                 .ForMember(dest => dest.ReviewsCount, opt =>
-                    opt.MapFrom(src => src.Reviews != null ? src.Reviews.Count : 0));
+                    opt.MapFrom(src => src.Reviews != null ? src.Reviews.Count : 0))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
+                .ForMember(dest => dest.OriginalPrice, opt => opt.MapFrom(src => src.Price))
+                .ForMember(dest => dest.DiscountedPrice, opt => opt.Ignore())
+                .ForMember(dest => dest.DiscountPercentage, opt => opt.Ignore())
+                .ForMember(dest => dest.MembershipTierName, opt => opt.Ignore());
+            ;
 
             // ProductVariant mapping
             CreateMap<ProductVariant, ProductVariantDto>();
@@ -42,6 +49,6 @@ namespace Web.Mapping
 
         }
 
-        
+
     }
 }
