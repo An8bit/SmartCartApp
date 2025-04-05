@@ -80,14 +80,14 @@ namespace Web.Repositories.Implementations
         }
     
 
-        public async Task<ShoppingCart> GetCartByUserIdAsync(int userId)
+        public async Task<ShoppingCart>? GetCartByUserIdAsync(int userId)
         {
             var cart = await _context.ShoppingCarts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null)
-                throw new KeyNotFoundException($"Cart for user with id {userId} not found.");
+                return null;
 
             // Load related entities if cart exists and has items
             if (cart.CartItems != null && cart.CartItems.Any())
@@ -127,9 +127,58 @@ namespace Web.Repositories.Implementations
                .FirstOrDefaultAsync(i => i.CartItemId == cartItemId);
         }
 
-        public Task MergeCartsAsync(string sessionId, int userId)
+        public async Task MergeCartsAsync(string sessionId, int userId)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(sessionId) || userId <= 0)
+            {
+                throw new ArgumentException("SessionId hoặc UserId không hợp lệ.");
+            }
+
+            var sessionCart = await _context.ShoppingCarts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.SessionId == sessionId);
+
+            var userCart = await _context.ShoppingCarts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (sessionCart == null && userCart == null)
+            {
+                // Không có giỏ hàng nào tồn tại
+                return;
+            }
+
+            if (sessionCart != null)
+            {
+                if (userCart == null)
+                {
+                    // Nếu người dùng chưa có giỏ hàng, gán giỏ hàng tạm thời cho người dùng
+                    sessionCart.UserId = userId;
+                }
+                else
+                {
+                    // Kết hợp các mục trong giỏ hàng
+                    foreach (var item in sessionCart.CartItems ?? new List<CartItem>())
+                    {
+                        var existingItem = userCart.CartItems!
+                            .FirstOrDefault(ci => ci.ProductId == item.ProductId);
+
+                        if (existingItem != null)
+                        {
+                            existingItem.Quantity += item.Quantity;
+                        }
+                        else
+                        {
+                            userCart.CartItems!.Add(item);
+                        }
+                    }
+
+                    // Xóa giỏ hàng tạm thời
+                    _context.ShoppingCarts.Remove(sessionCart);
+                }
+
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task UpdateCartAsync(ShoppingCart cart)

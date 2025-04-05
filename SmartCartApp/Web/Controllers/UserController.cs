@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Web.Data;
 using Web.Models.Domain;
 using Web.Models.DTO;
-using Web.Models.DTO.UrserDTOs;
+using Web.Models.DTO.UserDTOs;
+using Web.Models.DTO.UserAddressDTOs;
 using Web.Repositories.Contracts;
 using Web.Repositories.Interfaces.IServices;
 using Web.Services;
@@ -65,11 +67,27 @@ namespace Web.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult> LoginAsync([FromBody] UserLoginDto loginDto)
         {
-            var token = await _userService.LoginAsync(loginDto);
+            var user = await _userService.GetUserByEmailAsync(loginDto.Email);
 
-            if (token == null)
+            if (user == null)
                 return Unauthorized();
-            return Ok(token);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Name, user.Email)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, "CookieAuth");
+            var authProperties = new Microsoft.AspNetCore.Authentication.AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(60)
+            };
+
+            await HttpContext.SignInAsync("CookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
+
+            return Ok(new { Message = "Đăng nhập thành công" });
         }
 
         [HttpPost("Register")]
@@ -77,8 +95,32 @@ namespace Web.Controllers
         {
             string respon = await _userService.RegisterAsync(registerDto);
             if (respon.Equals("Email đã được đăng ký rồi"))
-                return BadRequest("Email đã được đăng ký rồi");
+                return BadRequest(new { message = "Email đã được đăng ký rồi" });
             return Ok("Tạo tài khoản thành công");
+        }
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("CookieAuth");
+            return Ok(new { Message = "Đăng xuất thành công" });
+        }
+    [HttpPut("UpdateAddress")]
+        public async Task<IActionResult> UpdateAddressAsync([FromBody] UserAddressUpdateDto addressDto)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            try
+            {
+                await _userService.UpdateUserAddressAsync(userId, addressDto);
+                return Ok(new { Message = "Cập nhật địa chỉ thành công" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request", error = ex.Message });
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Web.Models.Domain;
 using Web.Models.DTO.ProductDTOs;
-using Web.Models.DTO.UrserDTOs;
+using Web.Models.DTO.UserDTOs;
 using Web.Models.DTO.UserAddressDTOs;
 
 namespace Web.Repositories.Interfaces.IServices
@@ -19,17 +19,17 @@ namespace Web.Repositories.Interfaces.IServices
         Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
 
         // User profile methods
-        Task<UserDto> GetUserByIdAsync(int userId);
-        Task<UserDto> GetUserByEmailAsync(string email);
+        Task<UserDtos> GetUserByIdAsync(int userId);
+        Task<UserDtos> GetUserByEmailAsync(string email);
 
         Task UpdateUserAsync(int userId, UserUpdateDto updateDto);
 
         // Admin methods
-        Task<IEnumerable<UserDto> >GetAllUsersAsync();
+        Task<IEnumerable<UserDtos> >GetAllUsersAsync();
 
-        Task<UserDto> CreateUserAsync(UserCreateDto createDto);
+        Task<UserDtos> CreateUserAsync(UserCreateDto createDto);
 
-        Task<UserDto> AdminUpdateUserAsync(int userId, UserAdminUpdateDto updateDto);
+        Task<UserDtos> AdminUpdateUserAsync(int userId, UserAdminUpdateDto updateDto);
 
         Task<bool> DeleteUserAsync(int userId);
 

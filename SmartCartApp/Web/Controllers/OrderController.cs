@@ -12,6 +12,7 @@ namespace Web.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private const string SessionIdCookieName = "CartSessionId";
 
         public OrderController(IOrderService orderService)
         {
@@ -41,6 +42,7 @@ namespace Web.Controllers
             try
             {
                 var userId = GetUserId();
+                
                 var order = await _orderService.GetOrderByIdAsync(id, userId);
                 return Ok(order);
             }
@@ -70,11 +72,11 @@ namespace Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message ="lỖI "+ ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, new { message = "CreateOrder " + ex.Message });
             }
         }
 
@@ -173,6 +175,53 @@ namespace Web.Controllers
                 throw new UnauthorizedAccessException("Invalid user identification");
             }
             return userId;
+        }
+
+        private string GetOrCreateSessionId()
+        {
+            // Kiểm tra cookies trước
+            if (Request.Cookies.TryGetValue("CartSessionId", out var existingSessionId) && !string.IsNullOrEmpty(existingSessionId))
+            {
+                return existingSessionId;
+            }
+
+            // Kiểm tra trong request body hoặc query
+            var sessionIdFromRequest = HttpContext.Request.Query["sessionId"].ToString();
+            if (string.IsNullOrEmpty(sessionIdFromRequest))
+            {
+                // Cố gắng đọc từ body (nếu có)
+                try
+                {
+                    // Logic đọc từ body (tùy thuộc vào framework)
+                }
+                catch { }
+            }
+
+            if (!string.IsNullOrEmpty(sessionIdFromRequest))
+            {
+                // Sử dụng sessionId từ request
+                SetSessionId(sessionIdFromRequest);
+                return sessionIdFromRequest;
+            }
+            return "";
+            
+        }
+        private void SetSessionId(string sessionId)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(30),
+                SameSite = SameSiteMode.Lax,
+                Secure = false,
+                Domain = null,
+            };
+
+            Response.Cookies.Append(SessionIdCookieName, sessionId, cookieOptions);
+        }
+        private string? GetSessionId()
+        {
+            return Request.Cookies[SessionIdCookieName];
         }
     }
 }

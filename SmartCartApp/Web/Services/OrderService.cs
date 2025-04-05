@@ -28,15 +28,15 @@ namespace Web.Services
         public async Task<OrderDto> CreateOrderFromCartAsync(int userId, CreateOrderDto createOrderDto)
         {
             // Get user's cart
-            var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+            var cart = await _cartRepository.GetCartByUserIdAsync(userId)!;
             if (cart == null || !cart.CartItems.Any())
             {
                 throw new InvalidOperationException("Your cart is empty");
             }
 
             // Validate shipping address
-            var userAddresses = await _userRepository.GetUserAddressesAsync(userId);
-            var shippingAddress = userAddresses.FirstOrDefault(a => a.AddressId == createOrderDto.ShippingAddressId);
+            var shippingAddress = await _userRepository.GetUserAddressesAsync(userId);        
+           
             if (shippingAddress == null)
             {
                 throw new InvalidOperationException("Invalid shipping address");
@@ -55,34 +55,34 @@ namespace Web.Services
             }
 
             // Validate products stock
-            foreach (var item in cartItems)
-            {
-                var product = await _productRepository.GetByIdAsync(item.ProductId);
-                if (product == null)
-                {
-                    throw new InvalidOperationException($"Product with ID {item.ProductId} not found");
-                }
+            //foreach (var item in cartItems)
+            //{
+            //    var product = await _productRepository.GetByIdAsync(item.ProductId);
+            //    if (product == null)
+            //    {
+            //        throw new InvalidOperationException($"Product with ID {item.ProductId} not found");
+            //    }
 
-                int stockQuantity;
-                if (item.ProductVariantId.HasValue)
-                {
-                    var variant = product.Variants.FirstOrDefault(v => v.ProductId == item.ProductId);
-                    if (variant == null)
-                    {
-                        throw new InvalidOperationException($"Product variant with ID {item.ProductVariantId} not found");
-                    }
-                    stockQuantity = variant.StockQuantity;
-                }
-                else
-                {
-                    stockQuantity = product.ProductId;
-                }
+            //    int stockQuantity;
+            //    if (item.ProductVariantId.HasValue)
+            //    {
+            //        var variant = product.Variants.FirstOrDefault(v => v.ProductId == item.ProductId);
+            //        if (variant == null)
+            //        {
+            //            throw new InvalidOperationException($"Product variant with ID {item.ProductVariantId} not found");
+            //        }
+            //        stockQuantity = variant.StockQuantity;
+            //    }
+            //    else
+            //    {
+            //        stockQuantity = product.ProductId;
+            //    }
 
-                if (stockQuantity < item.Quantity)
-                {
-                    throw new InvalidOperationException($"Not enough stock for product {product.Name}. Available: {stockQuantity}");
-                }
-            }
+            //    if (stockQuantity < item.Quantity)
+            //    {
+            //        throw new InvalidOperationException($"Not enough stock for product {product.Name}. Available: {stockQuantity}");
+            //    }
+            //}
 
             // Create new order
             var order = new Order

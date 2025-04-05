@@ -22,6 +22,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 });
 // Add services to the container.
+builder.Services.AddAuthentication("CookieAuth")
+    .AddCookie("CookieAuth", options =>
+    {
+        options.LoginPath = "/api/User/Login";
+        options.AccessDeniedPath = "/api/User/Forbidden/";
+    });
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -39,6 +45,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 // Register services
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -46,6 +53,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // Configure AutoMapper
 builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
@@ -53,6 +61,7 @@ builder.Services.AddAutoMapper(typeof(CategoryMappingProfile));
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(ShoppingCartMappingProfile));
 builder.Services.AddAutoMapper(typeof(OrderMappingProfile));
+builder.Services.AddAutoMapper(typeof(PaymentMappingProfile));
 
 
 builder.Services.AddCors(options =>
@@ -86,6 +95,8 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseCors("AllowAll");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

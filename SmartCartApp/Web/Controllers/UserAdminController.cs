@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web.Models.DTO.UrserDTOs;
+using Web.Models.DTO.UserDTOs;
 using Web.Repositories.Interfaces.IServices;
 using Web.UserStates;
 
@@ -19,14 +19,14 @@ namespace Web.Controllers
        }
 
        [HttpGet]
-       public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+       public async Task<ActionResult<IEnumerable<UserDtos>>> GetAllUsers()
        {
            var users = await _userService.GetAllUsersAsync();
            return Ok(users);
        }
 
        [HttpGet("{id}")]
-       public async Task<ActionResult<UserDto>> GetUserById(int id)
+       public async Task<ActionResult<UserDtos>> GetUserById(int id)
        {
            try
            {
@@ -40,7 +40,7 @@ namespace Web.Controllers
        }
 
        [HttpPost]
-       public async Task<ActionResult<UserDto>> CreateUser([FromBody] UserCreateDto createDto)
+       public async Task<ActionResult<UserDtos>> CreateUser([FromBody] UserCreateDto createDto)
        {
            try
            {
@@ -54,7 +54,7 @@ namespace Web.Controllers
        }
 
        [HttpPut("{id}")]
-       public async Task<ActionResult<UserDto>> UpdateUser(int id, [FromBody] UserAdminUpdateDto updateDto)
+       public async Task<ActionResult<UserDtos>> UpdateUser(int id, [FromBody] UserAdminUpdateDto updateDto)
        {
            try
            {
@@ -86,7 +86,7 @@ namespace Web.Controllers
        }
 
        [HttpGet("email/{email}")]
-       public async Task<ActionResult<UserDto>> GetUserByEmail(string email)
+       public async Task<ActionResult<UserDtos>> GetUserByEmail(string email)
        {
            try
            {

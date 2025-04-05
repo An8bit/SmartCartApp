@@ -5,7 +5,7 @@ namespace Web.Repositories.Contracts
     public interface IShoppingCartRepository
     {
         // Giỏ hàng
-        Task<ShoppingCart> GetCartByUserIdAsync(int userId);
+        Task<ShoppingCart>? GetCartByUserIdAsync(int userId);
         Task<ShoppingCart?> GetCartBySessionIdAsync(string sessionId);
         Task<ShoppingCart> CreateCartAsync(ShoppingCart cart);
         Task UpdateCartAsync(ShoppingCart cart);

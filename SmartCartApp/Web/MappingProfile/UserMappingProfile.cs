@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Web.Models.Domain;
-using Web.Models.DTO.UrserDTOs;
+using Web.Models.DTO.UserDTOs;
 using Web.Models.DTO.UserAddressDTOs;
 
 namespace Web.MappingProfile
@@ -10,7 +10,7 @@ namespace Web.MappingProfile
         public UserMappingProfile()
         {
             // User -> UserDto (Basic safe info)
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDtos>();
 
             // User -> UserDetailsDto (With related entity counts)
             CreateMap<User, UserDetailsDto>()
@@ -80,17 +80,17 @@ namespace Web.MappingProfile
                 .ForMember(dest => dest.User, opt => opt.Ignore());
 
             // UserAddressUpdateDto -> UserAddress
-            CreateMap<UserAddressUpdateDto, UserAddress>()             
+            CreateMap<UserAddressUpdateDto, UserAddress>()
                 .ForMember(dest => dest.AddressLine1, opt =>
-                    opt.Condition(src => !string.IsNullOrEmpty(src.AddressLine)))
+                    opt.Condition(src => !string.IsNullOrEmpty(src.AddressLine1)))
+                .ForMember(dest => dest.AddressLine2, opt =>
+                    opt.Condition(src => !string.IsNullOrEmpty(src.AddressLine2)))
                 .ForMember(dest => dest.City, opt =>
                     opt.Condition(src => !string.IsNullOrEmpty(src.City)))
                 .ForMember(dest => dest.State, opt =>
                     opt.Condition(src => !string.IsNullOrEmpty(src.State)))
                 .ForMember(dest => dest.PostalCode, opt =>
                     opt.Condition(src => !string.IsNullOrEmpty(src.PostalCode)))
-                .ForMember(dest => dest.AddressLine1, opt =>
-                    opt.Condition(src => !string.IsNullOrEmpty(src.AddressLine)))
                 .ForMember(dest => dest.IsDefault, opt =>
                     opt.Condition(src => src.IsDefault.HasValue))
                 .ForMember(dest => dest.User, opt => opt.Ignore())

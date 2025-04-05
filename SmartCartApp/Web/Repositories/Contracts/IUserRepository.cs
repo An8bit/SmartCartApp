@@ -1,7 +1,7 @@
 ﻿using Web.Models.Domain;
 using Web.Models.DTO;
 using Web.Models.DTO.ProductDTOs;
-using Web.Models.DTO.UrserDTOs;
+using Web.Models.DTO.UserDTOs;
 using Web.Repositories.Interfaces;
 
 namespace Web.Repositories.Contracts
@@ -18,7 +18,7 @@ namespace Web.Repositories.Contracts
 
         Task<IEnumerable<UserAddress>> GetUserAddressesAsync(int userId);
 
-        Task<UserAddress> GetUserAddressByIdAsync(int addressId);
+        Task<UserAddress?> GetUserAddressByIdAsync(int addressId);
 
         Task<UserAddress> AddUserAddressAsync(UserAddress address);
 

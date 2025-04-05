@@ -31,5 +31,8 @@ namespace Web.Models.Domain
         [ForeignKey("OrderId")]
         [JsonIgnore]
         public Order Order { get; set; }
+
+        [StringLength(200)]
+        public string? FailureReason { get; set; }
     }
 }

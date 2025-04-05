@@ -3,7 +3,7 @@ using Web.Data;
 using Web.Models.Domain;
 using Web.Models.DTO;
 using Web.Models.DTO.ProductDTOs;
-using Web.Models.DTO.UrserDTOs;
+using Web.Models.DTO.UserDTOs;
 using Web.Repositories.Contracts;
 
 namespace Web.Repositories.Implementations
@@ -16,9 +16,11 @@ namespace Web.Repositories.Implementations
         {
         }
 
-        public Task<UserAddress> AddUserAddressAsync(UserAddress address)
+        public async Task<UserAddress> AddUserAddressAsync(UserAddress address)
         {
-            throw new NotImplementedException();
+            await _context.UserAddresses.AddAsync(address);
+            await _context.SaveChangesAsync();
+            return address;
         }
 
         public Task DeleteUserAddressAsync(int addressId)
@@ -29,7 +31,7 @@ namespace Web.Repositories.Implementations
         public async Task<User?> GetByEmailAsync(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
-            return user;
+            return user!;
         }
 
         public Task<User> GetByIdWithDetailsAsync(int userId)
@@ -42,14 +44,14 @@ namespace Web.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<UserAddress> GetUserAddressByIdAsync(int addressId)
+        public async Task<UserAddress?> GetUserAddressByIdAsync(int addressId)
         {
-            throw new NotImplementedException();
+            return await _context.UserAddresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
         }
 
-        public Task<IEnumerable<UserAddress>> GetUserAddressesAsync(int userId)
+        public async Task<IEnumerable<UserAddress>> GetUserAddressesAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _context.UserAddresses.Where(a => a.UserId == userId).ToListAsync();
         }
 
         public async Task<bool> IsEmailExistsAsync(string email, int? excludeUserId = null)
@@ -62,7 +64,7 @@ namespace Web.Repositories.Implementations
         public async Task<User?> LoginAsync(UserLoginDto userLogin)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userLogin.Email && x.PasswordHash == userLogin.Password);
-            return user;
+            return user!;
         }
 
         public async Task<bool> RegisterAsync(User userRegister)
@@ -79,9 +81,10 @@ namespace Web.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public Task UpdateUserAddressAsync(UserAddress address)
+        public async Task UpdateUserAddressAsync(UserAddress address)
         {
-            throw new NotImplementedException();
+             _context.UserAddresses.Update(address);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -2,10 +2,10 @@
 using Web.Models.Domain;
 using Web.Models.DTO.UserAddressDTOs;
 
-namespace Web.Models.DTO.UrserDTOs
+namespace Web.Models.DTO.UserDTOs
 {
     // Basic user info - Safe to return to client (no sensitive data)
-    public class UserDto
+    public class UserDtos
     {
         public int UserId { get; set; }
 

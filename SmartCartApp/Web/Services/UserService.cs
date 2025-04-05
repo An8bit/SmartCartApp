@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Data.SqlTypes;
 using Web.Models.Domain;
 using Web.Models.DTO.ProductDTOs;
-using Web.Models.DTO.UrserDTOs;
+using Web.Models.DTO.UserDTOs;
 using Web.Models.DTO.UserAddressDTOs;
 using Web.Repositories.Contracts;
 using Web.Repositories.Interfaces.IServices;
@@ -24,7 +24,7 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public async Task<UserDto> AdminUpdateUserAsync(int userId, UserAdminUpdateDto updateDto)
+        public async Task<UserDtos> AdminUpdateUserAsync(int userId, UserAdminUpdateDto updateDto)
         {
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
@@ -40,7 +40,7 @@ namespace Web.Services
 
             await _userRepository.UpdateAsync(user);
 
-            return _mapper.Map<UserDto>(user);
+            return _mapper.Map<UserDtos>(user);
         }
 
         public Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto)
@@ -48,7 +48,7 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public async Task<UserDto> CreateUserAsync(UserCreateDto createDto)
+        public async Task<UserDtos> CreateUserAsync(UserCreateDto createDto)
         {
             // Check if email already exists
             if (await _userRepository.IsEmailExistsAsync(createDto.Email))
@@ -61,7 +61,7 @@ namespace Web.Services
             var createdUser = await _userRepository.AddAsync(newUser);
 
             // Return user DTO
-            return _mapper.Map<UserDto>(createdUser);
+            return _mapper.Map<UserDtos>(createdUser);
         }
 
         public Task<bool> DeleteUserAddressAsync(int addressId)
@@ -78,10 +78,10 @@ namespace Web.Services
             return true;
         }
 
-        public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+        public async Task<IEnumerable<UserDtos>> GetAllUsersAsync()
         {
             var user = await _userRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<UserDto>>(user);
+            return _mapper.Map<IEnumerable<UserDtos>>(user);
         }
 
        
@@ -96,20 +96,20 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public async Task<UserDto> GetUserByEmailAsync(string email)
+        public async Task<UserDtos> GetUserByEmailAsync(string email)
         {
             var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
                 throw new KeyNotFoundException($"Không tìm thấy người dùng với email: {email}");
-            return _mapper.Map<UserDto>(user);
+            return _mapper.Map<UserDtos>(user);
         }
 
-        public async Task<UserDto> GetUserByIdAsync(int userId)
+        public async Task<UserDtos> GetUserByIdAsync(int userId)
         {
            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                  throw new KeyNotFoundException($"Product with ID {userId} not found");
-            return _mapper.Map<UserDto>(user);
+            return _mapper.Map<UserDtos>(user);
         }
 
         public Task<UserDetailsDto> GetUserDetailsAsync(int userId)
@@ -156,9 +156,19 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public Task<UserAddressDto> UpdateUserAddressAsync(int addressId, UserAddressUpdateDto addressDto)
+        public async Task<UserAddressDto> UpdateUserAddressAsync(int addressId, UserAddressUpdateDto addressDto)
         {
-            throw new NotImplementedException();
+            var address = await _userRepository.GetUserAddressByIdAsync(addressId);
+            if (address == null)
+            {
+                throw new KeyNotFoundException($"Không tìm thấy địa chỉ với ID: {addressId}");
+            }
+
+            _mapper.Map(addressDto, address);
+
+            await _userRepository.UpdateUserAddressAsync(address);
+
+            return _mapper.Map<UserAddressDto>(address);
         }
 
         public async Task UpdateUserAsync(int userId, UserUpdateDto updateDto)
