@@ -117,6 +117,14 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
+        public async Task<UserMemberDto?> GetUserMemberShip(int userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException($"Product with ID {userId} not found");
+            return _mapper.Map<UserMemberDto>(user);
+        }
+
         public async Task<string> LoginAsync(UserLoginDto loginDto)
         {
             var checkemail = await _userRepository.GetByEmailAsync(loginDto.Email);
@@ -156,19 +164,9 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public async Task<UserAddressDto> UpdateUserAddressAsync(int addressId, UserAddressUpdateDto addressDto)
+        public Task<UserAddressDto> UpdateUserAddressAsync(int addressId, UserAddressUpdateDto addressDto)
         {
-            var address = await _userRepository.GetUserAddressByIdAsync(addressId);
-            if (address == null)
-            {
-                throw new KeyNotFoundException($"Không tìm thấy địa chỉ với ID: {addressId}");
-            }
-
-            _mapper.Map(addressDto, address);
-
-            await _userRepository.UpdateUserAddressAsync(address);
-
-            return _mapper.Map<UserAddressDto>(address);
+            throw new NotImplementedException();
         }
 
         public async Task UpdateUserAsync(int userId, UserUpdateDto updateDto)

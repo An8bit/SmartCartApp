@@ -12,13 +12,15 @@ namespace Web.Controllers
    public class UserAdminController : ControllerBase
    {
        private readonly IUserService _userService;
+        private readonly UserStateContext _userStateContext;
 
-       public UserAdminController(IUserService userService)
-       {
-           _userService = userService;
-       }
+        public UserAdminController(IUserService userService, UserStateContext userStateContext)
+        {
+            _userService = userService;
+            _userStateContext = userStateContext;
+        }
 
-       [HttpGet]
+        [HttpGet]
        public async Task<ActionResult<IEnumerable<UserDtos>>> GetAllUsers()
        {
            var users = await _userService.GetAllUsersAsync();
@@ -98,5 +100,7 @@ namespace Web.Controllers
                return NotFound(ex.Message);
            }
        }
-   }
+
+        
+    }
 }

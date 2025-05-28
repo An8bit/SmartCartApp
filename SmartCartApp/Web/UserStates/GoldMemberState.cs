@@ -1,4 +1,5 @@
 ﻿using Web.Models.Domain;
+using Web.Models.DTO.UserDTOs;
 
 namespace Web.UserStates
 {
@@ -25,14 +26,17 @@ namespace Web.UserStates
             return originalPrice * (1 - DiscountPercentage);
         }
 
-        public bool CanDemote(User user)
-        {
-            return user.TotalSpending < GetDemotionThreshold();
-        }
-
-        public bool CanPromote(User user)
+    
+        public bool CanDemote(UserDtos user)
         {
             return user.TotalSpending >= GetPromotionThreshold();
+        }
+
+     
+
+        public bool CanPromote(UserDtos user)
+        {
+            return user.TotalSpending < GetDemotionThreshold();
         }
 
         public decimal GetDemotionThreshold()

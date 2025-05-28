@@ -5,7 +5,7 @@ namespace Web.Repositories.Interfaces.IServices
 {
     public interface IPaymentService
     {
-        Task<bool> ProcessPayment(CreatePaymentDTO paymentDTO);
+        Task<bool> ProcessPayment(CreatePaymentDTO paymentDTO, int userId);
 
         Task<IEnumerable<Payment>> GetPaymentHistoryAsync();
 

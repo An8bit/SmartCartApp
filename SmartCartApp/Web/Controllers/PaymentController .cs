@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Web.Models.DTO.PaymentDTOs;
 using Web.Repositories.Interfaces.IServices;
 
@@ -21,9 +22,13 @@ namespace Web.Controllers
         {
             try
             {
-                bool result = await _paymentService.ProcessPayment(
-                    request
-                );
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null)
+                {
+                    return BadRequest(new { Success = false, Message = "User ID claim not found" });
+                }
+
+                bool result = await _paymentService.ProcessPayment(request ,int.Parse(userIdClaim));
 
                 if (result)
                 {

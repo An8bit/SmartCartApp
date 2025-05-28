@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SmartCartApp.Models.Payment;
+using System.Security.Claims;
 using Web.Models.Domain;
 using Web.Models.DTO.PaymentDTOs;
 using Web.Repositories.Contracts;
@@ -11,11 +12,13 @@ namespace Web.Services
     public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IUserRepository _userRepository;
         public readonly IMapper _mapper;
-        public PaymentService(IPaymentRepository paymentRepository, IMapper mapper)
+        public PaymentService(IPaymentRepository paymentRepository, IMapper mapper, IUserRepository userRepository)
         {
             _paymentRepository = paymentRepository;
             _mapper = mapper;
+            _userRepository = userRepository;
         }
         public Task<Payment> GetPaymentByIdAsync(int id)
         {
@@ -33,8 +36,9 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public async Task<bool> ProcessPayment(CreatePaymentDTO createPaymentDTO)
+        public async Task<bool> ProcessPayment(CreatePaymentDTO createPaymentDTO, int userId)
         {
+           
             // Sử dụng Strategy Pattern để xử lý thanh toán
             IPaymentStrategy paymentStrategy;
             switch (createPaymentDTO.PaymentMethod.ToLower())
@@ -67,10 +71,12 @@ namespace Web.Services
                     throw new NotSupportedException($"Phương thức thanh toán '{createPaymentDTO.PaymentMethod}' không được hỗ trợ.");
             }
 
-
-
             var paymentContext = new PaymentContext(paymentStrategy);
             bool paymentResult = paymentContext.ProcessPayment(createPaymentDTO.Amount);
+            //cập nhật TotalSpending
+            var user = await _userRepository.GetByIdAsync(userId);
+            user.TotalSpending += createPaymentDTO.Amount;
+            await _userRepository.UpdateAsync(user);
 
             var paymentDTO = new PaymentDTO
             {
@@ -83,7 +89,7 @@ namespace Web.Services
             };
 
             var payment = _mapper.Map<Payment>(paymentDTO);
-             await _paymentRepository.AddPaymentAsync(payment);
+            await _paymentRepository.AddPaymentAsync(payment);
             return true;
         }
     }

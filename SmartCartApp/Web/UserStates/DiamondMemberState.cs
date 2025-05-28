@@ -1,4 +1,5 @@
 ﻿using Web.Models.Domain;
+using Web.Models.DTO.UserDTOs;
 
 namespace Web.UserStates
 {
@@ -25,7 +26,8 @@ namespace Web.UserStates
             return originalPrice * (1 - DiscountPercentage);
         }
 
-        public bool CanDemote(User user)
+      
+        public bool CanDemote(UserDtos user)
         {
             return user.TotalSpending < GetDemotionThreshold();
         }
@@ -33,6 +35,11 @@ namespace Web.UserStates
         public bool CanPromote(User user)
         {
             return false; // Diamond is the highest tier, so promotion is not possible
+        }
+
+        public bool CanPromote(UserDtos user)
+        {
+            throw new NotImplementedException();
         }
 
         public decimal GetDemotionThreshold()

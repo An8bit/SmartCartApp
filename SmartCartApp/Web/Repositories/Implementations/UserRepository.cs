@@ -44,6 +44,13 @@ namespace Web.Repositories.Implementations
             throw new NotImplementedException();
         }
 
+        public async Task<decimal> GetTotalSpendingAsync(int userId)
+        {
+            return await _context.Orders
+                .Where(o => o.UserId == userId)
+                .SumAsync(o => o.TotalAmount);
+        }
+
         public async Task<UserAddress?> GetUserAddressByIdAsync(int addressId)
         {
             return await _context.UserAddresses.FirstOrDefaultAsync(a => a.AddressId == addressId);

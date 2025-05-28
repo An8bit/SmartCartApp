@@ -27,5 +27,6 @@ namespace Web.Repositories.Contracts
         // Add these methods to the existing interface
         Task<IEnumerable<Order>> GetAllOrdersAsync(int page = 1, int pageSize = 10);
         Task<int> GetOrderCountByStatusAsync(string status);
+        Task<decimal> GetTotalAmountPaidByUserAsync(int userId); // Tính tổng tiền đã thanh toán của user
     }
 }

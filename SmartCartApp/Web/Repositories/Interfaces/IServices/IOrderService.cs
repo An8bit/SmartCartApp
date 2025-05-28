@@ -19,5 +19,7 @@ namespace Web.Repositories.Interfaces.IServices
         // Admin operations
         Task<IEnumerable<OrderDto>> GetAllOrdersAsync(int page = 1, int pageSize = 10);
         Task<OrderStatisticsDto> GetOrderStatisticsAsync(DateTime? startDate = null, DateTime? endDate = null);
+
+        Task<decimal> GetTotalAmount(int orderId);
     }
 }

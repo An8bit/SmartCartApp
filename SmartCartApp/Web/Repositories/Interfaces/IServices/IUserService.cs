@@ -20,6 +20,7 @@ namespace Web.Repositories.Interfaces.IServices
 
         // User profile methods
         Task<UserDtos> GetUserByIdAsync(int userId);
+        Task<UserMemberDto?> GetUserMemberShip(int userId);
         Task<UserDtos> GetUserByEmailAsync(string email);
 
         Task UpdateUserAsync(int userId, UserUpdateDto updateDto);

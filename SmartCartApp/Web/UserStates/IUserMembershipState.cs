@@ -1,4 +1,5 @@
 ﻿using Web.Models.Domain;
+using Web.Models.DTO.UserDTOs;
 
 namespace Web.UserStates
 {
@@ -16,8 +17,8 @@ namespace Web.UserStates
         bool HasExclusiveAccess { get; }
 
         // Kiểm tra có thể nâng cấp hay giảm cấp
-        bool CanPromote(User user);
-        bool CanDemote(User user);
+        bool CanPromote(UserDtos user);
+        bool CanDemote(UserDtos user);
 
         // Tính toán giá sản phẩm sau khi áp dụng ưu đãi
         decimal CalculateDiscountedPrice(decimal originalPrice);

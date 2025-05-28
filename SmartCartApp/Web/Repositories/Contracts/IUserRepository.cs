@@ -30,5 +30,7 @@ namespace Web.Repositories.Contracts
         //regester and login
         Task<bool> RegisterAsync(User userRegister);
         Task<User?> LoginAsync(UserLoginDto userLogin);
+
+        Task<decimal>  GetTotalSpendingAsync(int userId);
     }
 }

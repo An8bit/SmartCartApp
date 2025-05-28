@@ -168,5 +168,13 @@ namespace Web.Repositories.Implementations
                 .Where(o => o.Status == status)
                 .CountAsync();
         }
+        public async Task<decimal> GetTotalAmountPaidByUserAsync(int userId)
+        {
+            return await _context.Orders
+                .Where(o => o.UserId == userId && o.Status != "Canceled" && o.Status != "Refunded")
+                .SumAsync(o => o.TotalAmount);
+        }
+
+
     }
 }

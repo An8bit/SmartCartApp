@@ -216,6 +216,14 @@ namespace Web.Services
             return statistics;
         }
 
+        public async Task<decimal> GetTotalAmount(int orderId)
+        {
+            decimal totalAmount = await _orderRepository.GetTotalAmountPaidByUserAsync(orderId);
+            return totalAmount;
+
+
+        }
+
         public async Task<IEnumerable<OrderDto>> GetUserOrdersAsync(int userId)
         {
             var orders = await _orderRepository.GetOrdersByUserIdAsync(userId);

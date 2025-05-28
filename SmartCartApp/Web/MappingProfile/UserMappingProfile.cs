@@ -95,6 +95,10 @@ namespace Web.MappingProfile
                     opt.Condition(src => src.IsDefault.HasValue))
                 .ForMember(dest => dest.User, opt => opt.Ignore())
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
+
+            CreateMap<User, UserMemberDto>();
+            CreateMap<UserDtos, UserMemberDto>();
+                
         }
     }
 }

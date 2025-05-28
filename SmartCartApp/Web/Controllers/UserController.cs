@@ -30,10 +30,14 @@ namespace Web.Controllers
         [HttpGet("Profile")]
         public async Task<IActionResult> GetProfile()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null)
+            {
+                return BadRequest(new { Success = false, Message = "User ID claim not found" });
+            }
             try
             {
-                var user = await _userService.GetUserByIdAsync(userId);
+                var user = await _userService.GetUserByIdAsync(int.Parse(userIdClaim));
                 return Ok(user);
             }
             catch (KeyNotFoundException ex)
@@ -107,10 +111,14 @@ namespace Web.Controllers
     [HttpPut("UpdateAddress")]
         public async Task<IActionResult> UpdateAddressAsync([FromBody] UserAddressUpdateDto addressDto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null)
+            {
+                return BadRequest(new { Success = false, Message = "User ID claim not found" });
+            }
             try
             {
-                await _userService.UpdateUserAddressAsync(userId, addressDto);
+                await _userService.UpdateUserAddressAsync(int.Parse(userIdClaim), addressDto);
                 return Ok(new { Message = "Cập nhật địa chỉ thành công" });
             }
             catch (KeyNotFoundException ex)

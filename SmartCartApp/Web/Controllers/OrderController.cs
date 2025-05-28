@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Web.Models.DTO.OrderDTOs;
+using Web.Models.DTO.UserDTOs;
 using Web.Repositories.Interfaces.IServices;
 
 namespace Web.Controllers
@@ -12,11 +13,13 @@ namespace Web.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly IUserService _userService;
         private const string SessionIdCookieName = "CartSessionId";
 
-        public OrderController(IOrderService orderService)
+        public OrderController(IOrderService orderService,IUserService userService)
         {
             _orderService = orderService;
+            _userService = userService;
         }
 
 
@@ -67,7 +70,18 @@ namespace Web.Controllers
             try
             {
                 var userId = GetUserId();
+               if(userId == 0)
+                {
+                    return BadRequest(new { message = "Đang nhập để tiếp tục thanh đặt hàng" });
+                }
                 var order = await _orderService.CreateOrderFromCartAsync(userId, createOrderDto);
+                //decimal totalAmount =  await _orderService.GetTotalAmount(userId);
+                //await _userService.UpdateUserAsync(userId, new UserUpdateDto
+                //{
+                //    TotalSpending = totalAmount,
+                   
+                //});
+
                 return CreatedAtAction(nameof(GetOrderById), new { id = order.OrderId }, order);
             }
             catch (InvalidOperationException ex)

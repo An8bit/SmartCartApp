@@ -1,4 +1,5 @@
 ﻿using Web.Models.Domain;
+using Web.Models.DTO.UserDTOs;
 
 namespace Web.UserStates
 {
@@ -29,12 +30,12 @@ namespace Web.UserStates
             return _states["STD"];
         }
 
-        public IUserMembershipState GetUserState(User user)
+        public IUserMembershipState GetUserState(UserDtos user)
         {
             return GetState(user.MembershipTier);
         }
 
-        public bool CheckAndUpdateUserTier(User user)
+        public bool CheckAndUpdateUserTier(UserDtos user)
         {
             var currentState = GetUserState(user);
 

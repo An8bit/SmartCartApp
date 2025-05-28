@@ -14,8 +14,31 @@ namespace Web.Models.DTO.UserDTOs
         public required string Email { get; set; }
 
         public required string Phone { get; set; }
+        public required string MembershipTier { get; set; } = "STD";
+
+        public decimal TotalSpending { get; set; }
+        public required string Role { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
+
+    }
+    public class UserMemberDto
+    {
+        public int UserId { get; set; }
+
+        public required string FullName { get; set; }
+
+        public required string Email { get; set; }
+
+        public required string Phone { get; set; }
 
         public required string Role { get; set; }
+
+        public decimal TotalSpending { get; set; }
+
+        public required string MembershipTier { get; set; } = "STD";
 
         public DateTime CreatedAt { get; set; }
 
@@ -45,6 +68,7 @@ namespace Web.Models.DTO.UserDTOs
 
         public int ReviewCount { get; set; }
     }
+
 
     // DTO for registration
     public class UserRegisterDto
@@ -107,6 +131,9 @@ namespace Web.Models.DTO.UserDTOs
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
         [StringLength(15, MinimumLength = 10, ErrorMessage = "Số điện thoại không hợp lệ")]
         public string? Phone { get; set; }
+
+
+        public decimal TotalSpending { get; set; }
     }
 
     // DTO for admin updating user
