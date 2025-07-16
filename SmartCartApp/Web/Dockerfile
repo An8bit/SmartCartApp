@@ -15,7 +15,7 @@ COPY ["SmartCartApp/Web/Web.csproj", "Web/"]
 COPY ["SmartCartApp/Infrastructure/Infrastructure.csproj", "Infrastructure/"]
 COPY ["SmartCartApp/Core/Core.csproj", "Core/"]
 RUN dotnet restore "./Web/Web.csproj"
-COPY SmartCartApp/Web/. .
+COPY . .
 WORKDIR "/src/SmartCartApp/Web"
 RUN dotnet build "./Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
