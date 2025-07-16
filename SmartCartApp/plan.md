@@ -1,3 +1,33 @@
+# SmartCart Front-end System Redesign
+
+## Mục tiêu thiết kế lại front end
+- Giảm thời gian từ khi người dùng truy cập đến khi thao tác được (tương tự "door-to-provider time" trong y tế).
+- Tăng trải nghiệm người dùng, giảm tỷ lệ bỏ dở thao tác (giảm "left-without-being-seen").
+- Đơn giản hóa quy trình đăng nhập, đăng ký, mua hàng, thanh toán.
+
+## Các thành phần giao diện chính (mapping với controller)
+- **Trang đăng nhập/đăng ký** (UserController)
+- **Trang quản lý tài khoản, hồ sơ** (UserController, MembershipController)
+- **Trang quản trị người dùng** (UserAdminController)
+- **Trang danh mục sản phẩm, tìm kiếm, lọc** (ProductsController, CategoriesController)
+- **Trang chi tiết sản phẩm** (ProductsController)
+- **Giỏ hàng & thanh toán** (ShoppingCartController, PaymentController)
+- **Quản lý đơn hàng, lịch sử mua hàng** (OrderController)
+- **Trang quản trị (admin):** quản lý sản phẩm, đơn hàng, người dùng
+
+## Luồng người dùng (User Flow) mới
+1. Đăng nhập/đăng ký nhanh (Quick Registration)
+2. Truy cập trực tiếp các chức năng chính sau khi đăng nhập
+3. Đặt hàng, thanh toán, theo dõi đơn hàng liền mạch, tối giản số bước
+4. Tối ưu hóa cho thiết bị di động
+
+## Đề xuất công nghệ front end
+- Sử dụng framework hiện đại (React/Vue/Angular)
+- Giao tiếp với backend qua REST API đã liệt kê
+- Quản lý trạng thái người dùng (session, authentication) rõ ràng
+
+---
+
 # SmartCart API Documentation
 
 ## Overview

@@ -27,11 +27,11 @@ namespace Web.Models.Domain
 
         [ForeignKey("CartId")]
         [JsonIgnore]
-        public ShoppingCart Cart { get; set; }
+        public ShoppingCart Cart { get; set; } = default!;
 
         [ForeignKey("ProductId")]
         [JsonIgnore]
-        public Product Product { get; set; }
+        public Product Product { get; set; } = default!;
 
         [ForeignKey("ProductVariantId")]
         [JsonIgnore]
