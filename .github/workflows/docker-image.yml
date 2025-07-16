@@ -32,5 +32,5 @@ jobs:
       # Nếu Dockerfile của bạn nằm trong thư mục con, ví dụ `Web/Dockerfile`,
       # hãy thay đổi giá trị của cờ --file bên dưới thành --file Web/Dockerfile
       - name: Build the Docker image
-        run: docker build --file Dockerfile --tag my-app:latest .
+        run: docker build --file ./SmartCartApp/Web/Dockerfile --tag my-app:latest .
 
