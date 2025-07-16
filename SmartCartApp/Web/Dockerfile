@@ -10,9 +10,9 @@ EXPOSE 8080
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["Web/Web.csproj", "Web/"]
-RUN dotnet restore "./Web/Web.csproj"
+WORKDIR "/src/Web"
+COPY ["Web.csproj", "Web/"]
+RUN dotnet restore "Web.csproj"
 COPY . .
 WORKDIR "/src/Web"
 RUN dotnet build "./Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
