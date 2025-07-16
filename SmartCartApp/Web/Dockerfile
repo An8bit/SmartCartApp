@@ -16,7 +16,7 @@ COPY ["SmartCartApp/Infrastructure/Infrastructure.csproj", "Infrastructure/"]
 COPY ["SmartCartApp/Core/Core.csproj", "Core/"]
 RUN dotnet restore "./Web/Web.csproj"
 COPY SmartCartApp/Web/. .
-WORKDIR "/src/Web"
+WORKDIR "/src/SmartCartApp/Web"
 RUN dotnet build "./Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
