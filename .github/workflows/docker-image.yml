@@ -23,5 +23,5 @@ jobs:
       # Bước 2: Build Docker image
       # Bước này chỉ build image để kiểm tra, không đẩy đi đâu cả
       - name: Build the Docker image
-        run: docker build -t Dockerfile:latest .
+        run: docker build .:latest .
 
