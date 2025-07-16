@@ -20,11 +20,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Bước 2: Build Docker image
+      # Bước 2: Liệt kê các file để kiểm tra đường dẫn (Debugging Step)
+      # Bước này sẽ hiển thị toàn bộ cấu trúc thư mục của bạn trong nhật ký (logs) của Action.
+      # Hãy xem nhật ký để tìm đúng đường dẫn đến Dockerfile của bạn.
+      - name: List files in the repository
+        run: ls -R
+
+      # Bước 3: Build Docker image
       # Lỗi "no such file or directory" nghĩa là GitHub Actions không tìm thấy file Dockerfile.
-      # Hãy đảm bảo file của bạn tên là 'Dockerfile' (phân biệt chữ hoa chữ thường) và nằm ở thư mục gốc của repository.
-      # Nếu nó nằm ở một thư mục khác, hãy thay đổi giá trị của cờ --file bên dưới.
-      # Ví dụ: --file Web/Dockerfile
+      # Hãy xem kết quả của bước "List files in the repository" ở trên để tìm đúng đường dẫn.
+      # Nếu Dockerfile của bạn nằm trong thư mục con, ví dụ `Web/Dockerfile`,
+      # hãy thay đổi giá trị của cờ --file bên dưới thành --file Web/Dockerfile
       - name: Build the Docker image
         run: docker build --file Dockerfile --tag my-app:latest .
 
