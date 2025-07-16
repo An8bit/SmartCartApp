@@ -1,0 +1,27 @@
+# Tên của quy trình làm việc (workflow)
+name: Build Docker Image
+
+# Điều kiện kích hoạt: Chạy workflow này mỗi khi có code được đẩy (push) lên nhánh `main`
+on:
+  push:
+    branches: [ "main" ]
+
+# Định nghĩa các công việc (jobs) sẽ được thực hiện
+jobs:
+  build:
+    # Tên của công việc
+    name: Build Docker Image
+    # Chạy trên một máy ảo Ubuntu phiên bản mới nhất do GitHub cung cấp
+    runs-on: ubuntu-latest
+
+    # Các bước thực hiện
+    steps:
+      # Bước 1: Lấy mã nguồn từ repository về máy ảo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Bước 2: Build Docker image
+      # Bước này chỉ build image để kiểm tra, không đẩy đi đâu cả
+      - name: Build the Docker image
+        run: docker build -t my-app:latest .
+
