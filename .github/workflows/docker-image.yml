@@ -14,7 +14,7 @@ permissions:
 # Biến môi trường để dễ quản lý
 env:
   AWS_REGION: us-east-1                   # Thay đổi vùng AWS nếu cần
-  ECR_REPOSITORY: my-app                  # Thay tên repository của bạn
+  ECR_REPOSITORY: my-csharp-app                  # Thay tên repository của bạn
 
 # Định nghĩa các công việc (jobs) sẽ được thực hiện
 jobs:
