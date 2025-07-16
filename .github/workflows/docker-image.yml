@@ -1,27 +1,29 @@
-# Tên của quy trình làm việc (workflow)
-name: Build Docker Image
+name: Docker Build and Push
 
-# Điều kiện kích hoạt: Chạy workflow này mỗi khi có code được đẩy (push) lên nhánh `main`
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
-# Định nghĩa các công việc (jobs) sẽ được thực hiện
 jobs:
   build:
-    # Tên của công việc
-    name: Build Docker Image
-    # Chạy trên một máy ảo Ubuntu phiên bản mới nhất do GitHub cung cấp
     runs-on: ubuntu-latest
 
-    # Các bước thực hiện
     steps:
-      # Bước 1: Lấy mã nguồn từ repository về máy ảo
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Bước 2: Build Docker image
-      # Bước này chỉ build image để kiểm tra, không đẩy đi đâu cả
-      - name: Build the Docker image
-        run: docker build .:latest .
+      - name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./SmartCartApp/Web
+          file: ./SmartCartApp/Web/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}:${{ github.sha }}
