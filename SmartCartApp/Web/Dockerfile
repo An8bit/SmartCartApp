@@ -11,11 +11,11 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Web/Web.csproj", "Web/"]
-COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
-COPY ["Core/Core.csproj", "Core/"]
+COPY ["SmartCartApp/Web/Web.csproj", "Web/"]
+COPY ["SmartCartApp/Infrastructure/Infrastructure.csproj", "Infrastructure/"]
+COPY ["SmartCartApp/Core/Core.csproj", "Core/"]
 RUN dotnet restore "./Web/Web.csproj"
-COPY . .
+COPY SmartCartApp/Web/. .
 WORKDIR "/src/Web"
 RUN dotnet build "./Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
