@@ -1,16 +1,26 @@
 # Tên của quy trình làm việc (workflow)
-name: Build Docker Image
+name: Build and Push Docker Image to ECR
 
 # Điều kiện kích hoạt: Chạy workflow này mỗi khi có code được đẩy (push) lên nhánh `main`
 on:
   push:
     branches: [ "main" ]
 
+# Cấp quyền cho workflow để lấy token xác thực từ AWS
+permissions:
+  contents: read
+  id-token: write
+
+# Biến môi trường để dễ quản lý
+env:
+  AWS_REGION: us-east-1                   # Thay đổi vùng AWS nếu cần
+  ECR_REPOSITORY: my-app                  # Thay tên repository của bạn
+
 # Định nghĩa các công việc (jobs) sẽ được thực hiện
 jobs:
-  build:
+  build-and-push:
     # Tên của công việc
-    name: Build Docker Image
+    name: Build and Push to ECR
     # Chạy trên một máy ảo Ubuntu phiên bản mới nhất do GitHub cung cấp
     runs-on: ubuntu-latest
 
@@ -20,17 +30,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Bước 2: Liệt kê các file để kiểm tra đường dẫn (Debugging Step)
-      # Bước này sẽ hiển thị toàn bộ cấu trúc thư mục của bạn trong nhật ký (logs) của Action.
-      # Hãy xem nhật ký để tìm đúng đường dẫn đến Dockerfile của bạn.
-      - name: List files in the repository
-        run: ls -R
+      # Bước 2: Cấu hình thông tin xác thực AWS
+      # Action này sẽ lấy thông tin xác thực từ GitHub Secrets và cấu hình môi trường
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      # Bước 3: Build Docker image
-      # Lỗi "no such file or directory" nghĩa là GitHub Actions không tìm thấy file Dockerfile.
-      # Hãy xem kết quả của bước "List files in the repository" ở trên để tìm đúng đường dẫn.
-      # Nếu Dockerfile của bạn nằm trong thư mục con, ví dụ `Web/Dockerfile`,
-      # hãy thay đổi giá trị của cờ --file bên dưới thành --file Web/Dockerfile
-      - name: Build the Docker image
-        run: docker build --file ./SmartCartApp/Web/Dockerfile --tag my-app:latest .
+      # Bước 3: Đăng nhập vào Amazon ECR
+      # Action này thực hiện lệnh `aws ecr get-login-password` và `docker login` một cách an toàn
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
+      # Bước 4: Build, tag, và đẩy image lên ECR
+      # - `steps.login-ecr.outputs.registry` lấy địa chỉ ECR registry từ bước đăng nhập
+      # - `github.sha` là mã hash của commit, dùng để tạo tag phiên bản duy nhất cho image
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build --file ./SmartCartApp/Web/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    
