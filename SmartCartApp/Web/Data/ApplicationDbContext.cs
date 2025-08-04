@@ -21,6 +21,7 @@ namespace Web.Data
         public DbSet<OrderHistory> OrderHistories { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<UserMembershipHistory> UserMembershipHistories { get; set; }
+        public DbSet<Discount> Discounts { get; set; }
     }
 
 }

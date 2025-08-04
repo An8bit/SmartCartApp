@@ -52,7 +52,7 @@ namespace Web.Controllers
         [HttpGet("ProfileByEmail/{email}")]
         public async Task<IActionResult> GetProfileByEmail(string email)
         {
-            
+
             try
             {
                 var user = await _userService.GetUserByEmailAsync(email);
@@ -75,7 +75,12 @@ namespace Web.Controllers
 
             if (user == null)
                 return Unauthorized();
-
+            //Kiểm tra mật khẩu
+            string isPasswordValid = await _userService.LoginAsync(loginDto);
+            if (isPasswordValid.Equals("Password Sai"))
+            {
+                return Unauthorized(new { message = "Mật khẩu không đúng nhé" });
+            }
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
@@ -91,7 +96,17 @@ namespace Web.Controllers
 
             await HttpContext.SignInAsync("CookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
 
-            return Ok(new { Message = "Đăng nhập thành công" });
+            return Ok(new
+            {
+                Message = "Đăng nhập thành công",
+                User = new
+                {
+                    UserId = user.UserId,
+                    Email = user.Email,
+                    FullName = user.FullName, // hoặc FirstName + LastName
+                                              // Chỉ trả về các field cần thiết, KHÔNG bao gồm password
+                }
+            });
         }
 
         [HttpPost("Register")]
@@ -100,7 +115,7 @@ namespace Web.Controllers
             string respon = await _userService.RegisterAsync(registerDto);
             if (respon.Equals("Email đã được đăng ký rồi"))
                 return BadRequest(new { message = "Email đã được đăng ký rồi" });
-            return Ok("Tạo tài khoản thành công");
+            return Ok(new { Message = "Tạo tài khoản thành công" });
         }
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
@@ -108,7 +123,7 @@ namespace Web.Controllers
             await HttpContext.SignOutAsync("CookieAuth");
             return Ok(new { Message = "Đăng xuất thành công" });
         }
-    [HttpPut("UpdateAddress")]
+        [HttpPut("UpdateAddress")]
         public async Task<IActionResult> UpdateAddressAsync([FromBody] UserAddressUpdateDto addressDto)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -120,6 +135,52 @@ namespace Web.Controllers
             {
                 await _userService.UpdateUserAddressAsync(int.Parse(userIdClaim), addressDto);
                 return Ok(new { Message = "Cập nhật địa chỉ thành công" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request", error = ex.Message });
+            }
+        }
+
+        [HttpPost("AddAddress")]
+        public async Task<IActionResult> AddAddressAsync([FromBody] UserAddressCreateDto addressDto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null)
+            {
+                return BadRequest(new { Success = false, Message = "User ID claim not found" });
+            }
+            try
+            {
+                await _userService.AddUserAddressAsync(int.Parse(userIdClaim), addressDto);
+                return Ok(new { Message = "Thêm địa chỉ thành công" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request", error = ex.Message });
+            }
+        }
+
+        [HttpGet("Addresses")]
+        public async Task<IActionResult> GetUserAddresses()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null)
+            {
+                return BadRequest(new { Success = false, Message = "User ID claim not found" });
+            }
+            try
+            {
+                var addresses = await _userService.GetUserAddressesAsync(int.Parse(userIdClaim));
+                return Ok(addresses);
             }
             catch (KeyNotFoundException ex)
             {

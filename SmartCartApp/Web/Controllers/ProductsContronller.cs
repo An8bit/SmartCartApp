@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models.DTO.ProductDTOs;
+using Web.Repositories.Interfaces.IServices;
 using Web.Repositories.Interfaces.Service;
 using Web.Services;
 
@@ -11,10 +12,12 @@ namespace Web.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IDiscountService _discountService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, IDiscountService discountService)
         {
             _productService = productService;
+            _discountService = discountService;
         }
 
         [HttpGet("filter")]
@@ -87,6 +90,31 @@ namespace Web.Controllers
         {
             var products = await _productService.GetAllProductsAsync();
             return Ok(products);
+        }
+        [HttpGet("{id}/price")]
+        public async Task<ActionResult<object>> GetProductPriceWithDiscount(int id)
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null)
+                return NotFound();
+
+            decimal originalPrice = product.Price;
+            decimal discountedPrice = await _discountService.CalculateDiscountedPriceAsync(id, originalPrice);
+
+            return Ok(new
+            {
+                ProductId = id,
+                ProductName = product.Name,
+                OriginalPrice = originalPrice,
+                DiscountedPrice = discountedPrice,
+                HasDiscount = originalPrice != discountedPrice
+            });
+        }
+        [HttpGet("discounted")]
+        public async Task<ActionResult<IEnumerable<ProductWithDiscountDTO>>> GetDiscountedProducts()
+        {
+            var discountedProducts = await _productService.GetAllDiscountedProductsAsync();
+            return Ok(discountedProducts);
         }
     }
 }

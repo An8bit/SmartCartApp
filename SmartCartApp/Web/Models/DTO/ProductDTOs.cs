@@ -176,4 +176,17 @@ namespace Web.Models.DTO.ProductDTOs
 
         public int TotalPages => (TotalCount + PageSize - 1) / PageSize;
     }
+    public class ProductWithDiscountDTO
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public string Description { get; set; }
+        public string ImageUrl { get; set; }
+        public decimal OriginalPrice { get; set; }
+        public decimal DiscountPercentage { get; set; }
+        public decimal DiscountedPrice { get; set; }
+        public DateTime DiscountStartDate { get; set; }
+        public DateTime DiscountEndDate { get; set; }
+        public bool IsActive => DateTime.UtcNow >= DiscountStartDate && DateTime.UtcNow <= DiscountEndDate;
+    }
 }

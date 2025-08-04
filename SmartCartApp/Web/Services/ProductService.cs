@@ -2,6 +2,7 @@
 using Web.Models.Domain;
 using Web.Models.DTO.ProductDTOs;
 using Web.Repositories.Contracts;
+using Web.Repositories.Implementations;
 using Web.Repositories.Interfaces.Service;
 
 namespace Web.Services
@@ -9,11 +10,13 @@ namespace Web.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IDiscountRepository _discountRepository;
         private readonly IMapper _mapper;
-        public ProductService(IProductRepository productRepository, IMapper mapper)
+        public ProductService(IProductRepository productRepository, IMapper mapper, IDiscountRepository dis)
         {
             _productRepository = productRepository;
             _mapper = mapper;
+            _discountRepository = dis;
         }
 
         public async Task<ProductDto> CreateProductAsync(CreateProductDto productDto)
@@ -37,6 +40,8 @@ namespace Web.Services
 
             await _productRepository.DeleteAsync(id);
         }
+
+      
 
         public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
         {
@@ -96,6 +101,51 @@ namespace Web.Services
             existingProduct.UpdatedAt = DateTime.UtcNow;
 
             await _productRepository.UpdateAsync(existingProduct);
+        }
+        public async Task<IEnumerable<ProductWithDiscountDTO>> GetAllDiscountedProductsAsync()
+        {
+            var now = DateTime.UtcNow;
+
+            // Chuyển đổi sang múi giờ Việt Nam (+7)
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"); // Hoặc "Asia/Ho_Chi_Minh"
+            var vietnamNow = TimeZoneInfo.ConvertTimeFromUtc(now, vietnamTimeZone);
+
+            // Lấy tất cả giảm giá đang hoạt động
+            var activeDiscounts = await _discountRepository.GetActiveDiscountsAsync();
+
+            // Lọc các giảm giá đang hoạt động theo thời gian Việt Nam
+            var filteredDiscounts = activeDiscounts
+                .Where(d => d.IsActive && d.StartDate <= vietnamNow && d.EndDate >= vietnamNow)
+                .GroupBy(d => d.ProductId)
+                .Select(g => g.OrderByDescending(d => d.DiscountPercentage).First()); // Lấy giảm giá cao nhất cho mỗi sản phẩm
+
+            var result = new List<ProductWithDiscountDTO>();
+
+            foreach (var discount in filteredDiscounts)
+            {
+                var product = await _productRepository.GetByIdAsync(discount.ProductId);
+                if (product != null)
+                {
+                    decimal originalPrice = product.Price;
+                    decimal discountAmount = originalPrice * (discount.DiscountPercentage / 100m);
+                    decimal discountedPrice = Math.Round(originalPrice - discountAmount, 2);
+
+                    result.Add(new ProductWithDiscountDTO
+                    {
+                        ProductId = product.ProductId,
+                        ProductName = product.Name,
+                        Description = product.Description,
+                        ImageUrl = product.ImageUrl,
+                        OriginalPrice = originalPrice,
+                        DiscountPercentage = discount.DiscountPercentage,
+                        DiscountedPrice = discountedPrice,
+                        DiscountStartDate = discount.StartDate,
+                        DiscountEndDate = discount.EndDate
+                    });
+                }
+            }
+
+            return result;
         }
     }
 }

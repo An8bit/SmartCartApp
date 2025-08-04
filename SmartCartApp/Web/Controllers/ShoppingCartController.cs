@@ -62,32 +62,41 @@ namespace Web.Controllers
         }
 
         [HttpPut("items/{cartItemId}")]
-        public async Task<IActionResult> UpdateCartItem(int cartItemId, [FromBody] int quantity)
+        public async Task<IActionResult> UpdateCartItem(int cartItemId, [FromBody] UpdateCartItemDto requestDto)
         {
             try
             {
                 var userId = GetUserId();
                 var sessionId = GetOrCreateSessionId();
 
-                var updateDto = new UpdateCartItemDto { CartItemId = cartItemId, Quantity = quantity };
+                // Validate request
+                if (requestDto == null)
+                {
+                    return BadRequest(new { message = "Request body is required" });
+                }
+
+                if (requestDto.Quantity <= 0)
+                {
+                    return BadRequest(new { message = "Quantity must be greater than 0" });
+                }
+
+                var updateDto = new UpdateCartItemDto
+                {
+                    CartItemId = cartItemId,
+                    Quantity = requestDto.Quantity
+                };
+
                 var cart = await _cartService.UpdateCartItemAsync(userId, sessionId, updateDto);
                 return Ok(cart);
             }
             catch (KeyNotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Forbid();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            }                    
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message });
+                //_logger.LogError(ex, "Error updating cart item {CartItemId}", cartItemId);
+                return StatusCode(500, new { message = "An error occurred while updating the cart item" });
             }
         }
         [HttpDelete("items/{cartItemId}")]

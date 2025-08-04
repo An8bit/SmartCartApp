@@ -1,5 +1,5 @@
 @echo off
-echo Starting SmartCartApp in English...
+echo Starting SmartCartApp 
 
 :: Set culture to English
 set DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false

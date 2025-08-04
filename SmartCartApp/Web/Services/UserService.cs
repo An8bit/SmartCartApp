@@ -19,9 +19,14 @@ namespace Web.Services
             _userRepository = userRepository;
             _mapper = mapper;
         }
-        public Task<UserAddressDto> AddUserAddressAsync(int userId, UserAddressCreateDto addressDto)
+        public async Task<UserAddressDto> AddUserAddressAsync(int userId, UserAddressCreateDto addressDto)
         {
-            throw new NotImplementedException();
+            var userAddress = _mapper.Map<UserAddress>(addressDto);
+            userAddress.UserId = userId; // Set the UserId from the parameter
+
+            var addedAddress = await _userRepository.AddUserAddressAsync(userAddress);
+
+            return _mapper.Map<UserAddressDto>(addedAddress);
         }
 
         public async Task<UserDtos> AdminUpdateUserAsync(int userId, UserAdminUpdateDto updateDto)
@@ -91,9 +96,12 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<UserAddressDto>> GetUserAddressesAsync(int userId)
+        public async Task<IEnumerable<UserAddressDto>> GetUserAddressesAsync(int userId)
         {
-            throw new NotImplementedException();
+           var  userAddress = await _userRepository.GetUserAddressesAsync(userId);
+            if (userAddress == null)
+                throw new KeyNotFoundException($"Không tìm thấy địa chỉ của người dùng với ID: {userId}");
+            return _mapper.Map<IEnumerable<UserAddressDto>>(userAddress);
         }
 
         public async Task<UserDtos> GetUserByEmailAsync(string email)
@@ -164,9 +172,21 @@ namespace Web.Services
             throw new NotImplementedException();
         }
 
-        public Task<UserAddressDto> UpdateUserAddressAsync(int addressId, UserAddressUpdateDto addressDto)
+        public async Task<UserAddressDto> UpdateUserAddressAsync(int addressId, UserAddressUpdateDto addressDto)
         {
-            throw new NotImplementedException();
+            // Get the existing address
+            var existingAddress = await _userRepository.GetUserAddressByIdAsync(addressId);
+            if (existingAddress == null)
+                throw new KeyNotFoundException($"Không tìm thấy địa chỉ với ID: {addressId}");
+
+            // Map the update data to the existing address
+            _mapper.Map(addressDto, existingAddress);
+
+            // Update the address in the repository
+            await _userRepository.UpdateUserAddressAsync(existingAddress);
+
+            // Return the updated address as DTO
+            return _mapper.Map<UserAddressDto>(existingAddress);
         }
 
         public async Task UpdateUserAsync(int userId, UserUpdateDto updateDto)

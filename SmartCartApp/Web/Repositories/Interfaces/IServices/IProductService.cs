@@ -14,5 +14,6 @@ namespace Web.Repositories.Interfaces.Service
         Task<ProductDto> CreateProductAsync(CreateProductDto productDto);
         Task UpdateProductAsync(int id, UpdateProductDto productDto);
         Task DeleteProductAsync(int id);
+        Task<IEnumerable<ProductWithDiscountDTO>> GetAllDiscountedProductsAsync();
     }
 }
