@@ -1,4 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
+using System.Data;
+using Web.Data;
 using Web.Models.Domain;
 using Web.Models.DTO.OrderDTOs;
 using Web.OrderStates;
@@ -15,14 +19,16 @@ namespace Web.Services
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
         private readonly OrderStateContext _orderStateContext;
+        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IShoppingCartRepository cartRepository,IProductRepository productRepository,IUserRepository userRepository,IMapper mapper)
+        public OrderService(ApplicationDbContext context,IOrderRepository orderRepository, IShoppingCartRepository cartRepository,IProductRepository productRepository,IUserRepository userRepository,IMapper mapper)
         {
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
             _orderStateContext = new OrderStateContext();
+            _context = context;
             _mapper = mapper;
         }
         public async Task<OrderDto> CreateOrderFromCartAsync(int userId, CreateOrderDto createOrderDto)
@@ -149,6 +155,59 @@ namespace Web.Services
 
             return _mapper.Map<OrderDto>(createdOrder);
         }
+
+        public async Task<int?> CreateOrderFromCartUseProceAsync(int userId, int shippingAddressId, string paymentMethod)
+        {
+            try
+            {
+                using var connection = _context.Database.GetDbConnection();
+                await connection.OpenAsync();
+
+                using var command = connection.CreateCommand();
+                command.CommandText = "sp_CreateOrderFromCart";
+                command.CommandType = CommandType.StoredProcedure;
+
+                // Input parameters
+                command.Parameters.Add(new MySqlParameter("p_UserId", userId));
+                command.Parameters.Add(new MySqlParameter("p_ShippingAddressId", shippingAddressId));
+                command.Parameters.Add(new MySqlParameter("p_PaymentMethod", paymentMethod ?? string.Empty));
+
+                // Output parameter
+                var outputParam = new MySqlParameter("p_NewOrderId", MySqlDbType.Int32)
+                {
+                    Direction = ParameterDirection.Output
+                };
+                command.Parameters.Add(outputParam);
+
+                await command.ExecuteNonQueryAsync();
+
+                var resultValue = outputParam.Value;
+               
+
+                if (resultValue != null && resultValue != DBNull.Value)
+                {
+                    var orderId = Convert.ToInt32(resultValue);
+
+                    return orderId switch
+                    {
+                        -1 => throw new Exception("Lỗi cơ sở dữ liệu khi tạo đơn hàng"),
+                        -2 => throw new Exception("Không tìm thấy giỏ hàng"),
+                        -3 => throw new Exception("Giỏ hàng trống"),
+                        0 => null,
+                        > 0 => orderId,
+                        _ => null
+                    };
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+               
+                throw;
+            }
+        }
+        
 
         public async Task<IEnumerable<OrderDto>> GetAllOrdersAsync(int page = 1, int pageSize = 10)
         {

@@ -3,7 +3,10 @@
 namespace Web.Repositories.Interfaces.IServices
 {
     public interface IOrderService
-    {// Order retrieval
+    {
+        Task<int?> CreateOrderFromCartUseProceAsync(int userId, int shippingAddressId, string paymentMethod);
+
+        // Order retrieval
         Task<OrderDto> GetOrderByIdAsync(int orderId, int userId);
         Task<IEnumerable<OrderDto>> GetUserOrdersAsync(int userId);
 

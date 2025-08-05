@@ -1,4 +1,5 @@
-﻿using Web.Models.Domain;
+﻿using AutoMapper;
+using Web.Models.Domain;
 using Web.Models.DTO;
 using Web.Repositories.Contracts;
 using Web.Repositories.Interfaces.IServices;
@@ -8,16 +9,17 @@ namespace Web.Services
     public class DiscountService : IDiscountService
     {
         private readonly IDiscountRepository _discountRepository;
-
-        public DiscountService(IDiscountRepository discountRepository)
+        private readonly IMapper _mapper;
+        public DiscountService(IDiscountRepository discountRepository,IMapper mapper)
         {
             _discountRepository = discountRepository;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<DiscountDTO>> GetAllDiscountsAsync()
         {
             var discounts = await _discountRepository.GetAllAsync();
-            return discounts.Select(MapToDTO);
+            return _mapper.Map<IEnumerable<DiscountDTO>>(discounts);
         }
 
         public async Task<DiscountDTO> GetDiscountByIdAsync(int id)

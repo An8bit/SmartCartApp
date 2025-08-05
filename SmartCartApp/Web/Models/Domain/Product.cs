@@ -23,5 +23,8 @@ namespace Web.Models.Domain
 
         [JsonIgnore] // 
         public ICollection<ProductReview> Reviews { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Discount> Discounts { get; set; }
     }
 }

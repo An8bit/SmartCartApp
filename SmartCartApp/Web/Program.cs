@@ -57,6 +57,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPriceService, PriceService>();
 
 // Configure AutoMapper
 builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
@@ -65,6 +66,7 @@ builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(ShoppingCartMappingProfile));
 builder.Services.AddAutoMapper(typeof(OrderMappingProfile));
 builder.Services.AddAutoMapper(typeof(PaymentMappingProfile));
+builder.Services.AddAutoMapper(typeof(DiscountMappingProfile));
 
 builder.Services.AddCors(options =>
 {

@@ -3,6 +3,7 @@ using Web.Models.Domain;
 using Web.Models.DTO.ShoppingCartDTOs;
 using Web.Repositories.Contracts;
 using Web.Repositories.Interfaces.IServices;
+using Web.Services;
 
 namespace Web.Services
 {
@@ -10,14 +11,18 @@ namespace Web.Services
     {
         private readonly IShoppingCartRepository _cartRepository;
         private readonly IProductRepository _productRepository;
+        private readonly IPriceService _priceService;
         private readonly IMapper _mapper;
+        
         public ShoppingCartService(
            IShoppingCartRepository cartRepository,
            IProductRepository productRepository,
+           IPriceService priceService,
            IMapper mapper)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
+            _priceService = priceService;
             _mapper = mapper;
         }
         public async Task<ShoppingCartDto> AddToCartAsync(int? userId, string sessionId, AddToCartDto addToCartDto)
@@ -93,22 +98,22 @@ namespace Web.Services
 
             if (existingItem != null)
             {
-                // Nếu đã có, cập nhật số lượng
+                // Nếu đã có, cập nhật số lượng và recalculate price
                 existingItem.Quantity += addToCartDto.Quantity;
+                
+                // Recalculate price with current discounts
+                var priceInfo = await _priceService.CalculateProductPriceAsync(addToCartDto.ProductId, userId);
+                existingItem.UnitPrice = priceInfo.FinalPrice;
+                
                 existingItem.UpdatedAt = DateTime.UtcNow;
                 await _cartRepository.UpdateCartItemAsync(existingItem);
             }
             else
             {
                 // Nếu chưa có, thêm mới
-                decimal price = 
-                     product.Price;
-
-               // Áp dụng giảm giá nếu có
-                //if (product.Discount > 0)
-                //{
-                //    price = price - (price * product.Discount / 100);
-                //}
+                // Use PriceService to calculate the current price with discounts
+                var priceInfo = await _priceService.CalculateProductPriceAsync(addToCartDto.ProductId, userId);
+                decimal price = priceInfo.FinalPrice;
 
                 var newItem = new CartItem
                 {

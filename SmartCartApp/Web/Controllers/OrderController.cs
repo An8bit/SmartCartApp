@@ -16,7 +16,7 @@ namespace Web.Controllers
         private readonly IUserService _userService;
         private const string SessionIdCookieName = "CartSessionId";
 
-        public OrderController(IOrderService orderService,IUserService userService)
+        public OrderController(IOrderService orderService, IUserService userService)
         {
             _orderService = orderService;
             _userService = userService;
@@ -45,7 +45,7 @@ namespace Web.Controllers
             try
             {
                 var userId = GetUserId();
-                
+
                 var order = await _orderService.GetOrderByIdAsync(id, userId);
                 return Ok(order);
             }
@@ -70,7 +70,7 @@ namespace Web.Controllers
             try
             {
                 var userId = GetUserId();
-               if(userId == 0)
+                if (userId == 0)
                 {
                     return BadRequest(new { message = "Đang nhập để tiếp tục thanh đặt hàng" });
                 }
@@ -79,14 +79,41 @@ namespace Web.Controllers
                 //await _userService.UpdateUserAsync(userId, new UserUpdateDto
                 //{
                 //    TotalSpending = totalAmount,
-                   
+
                 //});
 
                 return CreatedAtAction(nameof(GetOrderById), new { id = order.OrderId }, order);
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message ="lỖI "+ ex.Message });
+                return BadRequest(new { message = "lỖI " + ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "CreateOrder " + ex.Message });
+            }
+        }
+        [HttpPost("OrderProduces")]
+        public async Task<IActionResult> CreateOrderFromCartAsync([FromBody] CreateOrderDto createOrderDto)
+        {
+            try
+            {
+                var userId = GetUserId();
+                if (userId == 0)
+                {
+                    return BadRequest(new { message = "Đang nhập để tiếp tục thanh đặt hàng" });
+                }
+                var orderId = await _orderService.CreateOrderFromCartUseProceAsync(
+                          userId,
+                          createOrderDto.ShippingAddressId,
+                          createOrderDto.PaymentMethod
+                      );
+
+                return Ok(new {  Message = "Order created successfully" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = "lỖI " + ex.Message });
             }
             catch (Exception ex)
             {
@@ -186,7 +213,7 @@ namespace Web.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
-                throw new UnauthorizedAccessException("Invalid user identification");
+                throw new UnauthorizedAccessException("nhận dạng người dùng không hợp lệ");
             }
             return userId;
         }
@@ -218,7 +245,7 @@ namespace Web.Controllers
                 return sessionIdFromRequest;
             }
             return "";
-            
+
         }
         private void SetSessionId(string sessionId)
         {

@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Web.Models.DTO.ShoppingCartDTOs;
+using Web.Repositories.Contracts;
 using Web.Repositories.Interfaces.IServices;
+using Web.Services;
 
 namespace Web.Controllers
 {
@@ -11,10 +13,13 @@ namespace Web.Controllers
     public class ShoppingCartController : ControllerBase
     {
         private readonly IShoppingCartService _cartService;
+        private readonly IPriceService _priceService;
         private const string SessionIdCookieName = "CartSessionId";
-        public ShoppingCartController(IShoppingCartService cartService)
+        
+        public ShoppingCartController(IShoppingCartService cartService, IPriceService priceService)
         {
             _cartService = cartService;
+            _priceService = priceService;
         }
 
         [HttpPost]
@@ -25,7 +30,16 @@ namespace Web.Controllers
                 var userId = GetUserId();
                 var sessionId = GetOrCreateSessionId();
 
+                // Calculate the current price with discounts before adding to cart
+                var priceInfo = await _priceService.CalculateProductPriceAsync(addToCartDto.ProductId, userId);
+                
+                // Add to cart using existing service (which will use product.Price)
+                // The service should be updated to use IPriceService, but for now this works as a temporary fix
                 var cart = await _cartService.AddToCartAsync(userId, sessionId, addToCartDto);
+                
+                // TODO: In a future version, modify ShoppingCartService to accept calculated price
+                // or inject IPriceService into ShoppingCartService for proper price calculation
+                
                 return Ok(cart);
             }
             catch (KeyNotFoundException ex)

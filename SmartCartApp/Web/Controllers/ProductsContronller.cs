@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models.DTO.ProductDTOs;
+using Web.Repositories.Contracts;
 using Web.Repositories.Interfaces.IServices;
 using Web.Repositories.Interfaces.Service;
 using Web.Services;
@@ -13,11 +14,13 @@ namespace Web.Controllers
     {
         private readonly IProductService _productService;
         private readonly IDiscountService _discountService;
+        private readonly IPriceService _priceService;
 
-        public ProductsController(IProductService productService, IDiscountService discountService)
+        public ProductsController(IProductService productService, IDiscountService discountService, IPriceService priceService)
         {
             _productService = productService;
             _discountService = discountService;
+            _priceService = priceService;
         }
 
         [HttpGet("filter")]
@@ -33,6 +36,14 @@ namespace Web.Controllers
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null)
                 return NotFound();
+
+            // Get price information with discounts
+            var priceInfo = await _priceService.CalculateProductPriceAsync(id);
+            
+            // tính trả về 
+            product.OriginalPrice = priceInfo.OriginalPrice;
+            product.DiscountedPrice = priceInfo.FinalPrice;
+            product.DiscountPercentage = priceInfo.DiscountPercentage;
 
             return Ok(product);
         }
@@ -92,28 +103,22 @@ namespace Web.Controllers
             return Ok(products);
         }
         [HttpGet("{id}/price")]
-        public async Task<ActionResult<object>> GetProductPriceWithDiscount(int id)
+        public async Task<ActionResult<ProductPriceInfoViewModel>> GetProductPriceWithDiscount(int id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
-            if (product == null)
-                return NotFound();
-
-            decimal originalPrice = product.Price;
-            decimal discountedPrice = await _discountService.CalculateDiscountedPriceAsync(id, originalPrice);
-
-            return Ok(new
+            try
             {
-                ProductId = id,
-                ProductName = product.Name,
-                OriginalPrice = originalPrice,
-                DiscountedPrice = discountedPrice,
-                HasDiscount = originalPrice != discountedPrice
-            });
+                var priceInfo = await _priceService.CalculateProductPriceAsync(id);
+                return Ok(priceInfo);
+            }
+            catch (ArgumentException)
+            {
+                return NotFound();
+            }
         }
         [HttpGet("discounted")]
-        public async Task<ActionResult<IEnumerable<ProductWithDiscountDTO>>> GetDiscountedProducts()
+        public async Task<ActionResult<IEnumerable<ProductPriceInfoViewModel>>> GetDiscountedProducts()
         {
-            var discountedProducts = await _productService.GetAllDiscountedProductsAsync();
+            var discountedProducts = await _priceService.GetProductsOnSaleAsync();
             return Ok(discountedProducts);
         }
     }
